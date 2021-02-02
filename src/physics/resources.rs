@@ -105,15 +105,13 @@ impl InteractionPairFilters {
     }
 
     /// Sets the custom contact pair filter.
-    pub fn contact_filter(mut self, filter: impl ContactPairFilter + 'static) -> Self {
+    pub fn contact_filter(&mut self, filter: impl ContactPairFilter + 'static) {
         self.contact_filter = Some(Box::new(filter) as Box<dyn ContactPairFilter>);
-        self
     }
 
     /// Sets the custom intersection pair filter.
-    pub fn intersection_filter(mut self, filter: impl IntersectionPairFilter + 'static) -> Self {
+    pub fn intersection_filter(&mut self, filter: impl IntersectionPairFilter + 'static) {
         self.intersection_filter =Some(Box::new(filter) as Box<dyn IntersectionPairFilter>);
-        self
     }
 }
 
