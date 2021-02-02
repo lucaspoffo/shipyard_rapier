@@ -1,9 +1,9 @@
-extern crate rapier2d as rapier; // For the debug UI.
-
 use macroquad::prelude::*;
-use rapier::dynamics::RigidBodyBuilder;
-use rapier::geometry::{ColliderBuilder, ContactPairFilter, PairFilterContext, SolverFlags};
-use rapier::pipeline::PhysicsPipeline;
+use rapier2d::{
+    dynamics::RigidBodyBuilder,
+    geometry::{ColliderBuilder, ContactPairFilter, PairFilterContext, SolverFlags},
+    pipeline::PhysicsPipeline,
+};
 use shipyard::{AllStoragesViewMut, UniqueViewMut, World};
 use shipyard_rapier2d::{
     physics::{

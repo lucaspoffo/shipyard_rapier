@@ -1,7 +1,5 @@
-extern crate rapier2d as rapier; // For the debug UI.
-
 use macroquad::prelude::*;
-use rapier::{
+use rapier2d::{
     dynamics::{RigidBodyBuilder, RigidBodySet},
     geometry::{ColliderBuilder, ColliderSet},
     pipeline::PhysicsPipeline,
