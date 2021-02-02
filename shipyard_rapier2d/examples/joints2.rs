@@ -10,7 +10,7 @@ use shipyard_rapier2d::{
     physics::{
         components::JointBuilderComponent,
         systems::{
-            create_body_and_collider_system, create_joints_system, setup, step_world_system,
+            create_body_and_collider_system, create_joints_system, setup_physics, step_world_system,
         },
     },
     render::{render_colliders, render_physics_stats},
@@ -19,8 +19,8 @@ use shipyard_rapier2d::{
 #[macroquad::main("Joints 2D")]
 async fn main() {
     let mut world = World::new();
-    setup(&mut world);
-    setup_physics(&mut world);
+    world.run(setup_physics).unwrap();
+    setup_physics_world(&mut world);
 
     let viewport_height = 60.0;
     let aspect = screen_width() / screen_height();
@@ -59,7 +59,7 @@ fn enable_physics_profiling(mut pipeline: UniqueViewMut<PhysicsPipeline>) {
     pipeline.counters.enable()
 }
 
-pub fn setup_physics(world: &mut World) {
+pub fn setup_physics_world(world: &mut World) {
     /*
      * Create the balls
      */

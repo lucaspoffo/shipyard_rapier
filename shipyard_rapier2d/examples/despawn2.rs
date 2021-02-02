@@ -4,7 +4,7 @@ use macroquad::prelude::*;
 use shipyard_rapier2d::{
     physics::systems::{
         create_body_and_collider_system, step_world_system,
-        setup, destroy_body_and_collider_system
+        setup_physics, destroy_body_and_collider_system
     },
     render::{render_colliders, render_physics_stats}
 };
@@ -22,8 +22,8 @@ pub struct DespawnResource {
 async fn main() {
     let mut world = World::new();
     world.add_unique(DespawnResource::default()).unwrap();
-    setup(&mut world);
-    setup_physics(&mut world);
+    world.run(setup_physics).unwrap();
+    setup_physics_world(&mut world);
     
     let viewport_height = 120.0;
     let aspect = screen_width() / screen_height();
@@ -61,7 +61,7 @@ fn enable_physics_profiling(mut pipeline: UniqueViewMut<PhysicsPipeline>) {
    pipeline.counters.enable()
 }
 
-pub fn setup_physics(world: &mut World) {
+pub fn setup_physics_world(world: &mut World) {
     /*
      * Ground
      */

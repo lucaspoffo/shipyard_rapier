@@ -10,29 +10,29 @@ use rapier::geometry::{BroadPhase, ColliderBuilder, ColliderSet, NarrowPhase};
 use rapier::pipeline::PhysicsPipeline;
 
 use shipyard::{
-    EntitiesView, Get, IntoIter, IntoWithId, UniqueView, UniqueViewMut, View, ViewMut, World,
+    EntitiesView, Get, IntoIter, IntoWithId, UniqueView, UniqueViewMut, View, ViewMut, AllStoragesViewMut,
 };
 
-pub fn setup(world: &mut World) {
-    world.add_unique(PhysicsPipeline::new()).unwrap();
-    world.add_unique(QueryPipeline::new()).unwrap();
-    world.add_unique(RapierConfiguration::default()).unwrap();
-    world.add_unique(IntegrationParameters::default()).unwrap();
-    world.add_unique(BroadPhase::new()).unwrap();
-    world.add_unique(NarrowPhase::new()).unwrap();
-    world.add_unique(RigidBodySet::new()).unwrap();
-    world.add_unique(ColliderSet::new()).unwrap();
-    world.add_unique(JointSet::new()).unwrap();
-    world.add_unique(InteractionPairFilters::new()).unwrap();
-    world.add_unique(EventQueue::new(true)).unwrap();
-    world.add_unique(SimulationToRenderTime::default()).unwrap();
-    world.add_unique(EntityMaps::default()).unwrap();
+pub fn setup_physics(all_storages: AllStoragesViewMut) {
+    all_storages.add_unique(PhysicsPipeline::new());
+    all_storages.add_unique(QueryPipeline::new());
+    all_storages.add_unique(RapierConfiguration::default());
+    all_storages.add_unique(IntegrationParameters::default());
+    all_storages.add_unique(BroadPhase::new());
+    all_storages.add_unique(NarrowPhase::new());
+    all_storages.add_unique(RigidBodySet::new());
+    all_storages.add_unique(ColliderSet::new());
+    all_storages.add_unique(JointSet::new());
+    all_storages.add_unique(InteractionPairFilters::new());
+    all_storages.add_unique(EventQueue::new(true));
+    all_storages.add_unique(SimulationToRenderTime::default());
+    all_storages.add_unique(EntityMaps::default());
 
-    let mut body_handles = world.borrow::<ViewMut<RigidBodyHandleComponent>>().unwrap();
+    let mut body_handles = all_storages.borrow::<ViewMut<RigidBodyHandleComponent>>().unwrap();
     body_handles.update_pack();
-    let mut collider_handles = world.borrow::<ViewMut<ColliderHandleComponent>>().unwrap();
+    let mut collider_handles = all_storages.borrow::<ViewMut<ColliderHandleComponent>>().unwrap();
     collider_handles.update_pack();
-    let mut joint_handles = world.borrow::<ViewMut<JointHandleComponent>>().unwrap();
+    let mut joint_handles = all_storages.borrow::<ViewMut<JointHandleComponent>>().unwrap();
     joint_handles.update_pack();
 }
 
