@@ -49,7 +49,7 @@ pub fn render_colliders(
 
     let gl = unsafe { get_internal_gl().quad_gl };
 
-    for (entity, collider) in &mut colliders_handles.iter().with_id() {
+    for (entity, collider) in colliders_handles.iter().with_id() {
         if let Some(collider) = colliders.get(collider.handle()) {
             if let Some(body) = bodies.get(collider.parent()) {
                 let default_color = if body.is_static() {
