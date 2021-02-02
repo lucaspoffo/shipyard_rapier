@@ -32,15 +32,15 @@ pub fn setup_physics(all_storages: AllStoragesViewMut) {
     let mut body_handles = all_storages
         .borrow::<ViewMut<RigidBodyHandleComponent>>()
         .unwrap();
-    body_handles.update_pack();
+    body_handles.track_deletion();
     let mut collider_handles = all_storages
         .borrow::<ViewMut<ColliderHandleComponent>>()
         .unwrap();
-    collider_handles.update_pack();
+    collider_handles.track_deletion();
     let mut joint_handles = all_storages
         .borrow::<ViewMut<JointHandleComponent>>()
         .unwrap();
-    joint_handles.update_pack();
+    joint_handles.track_deletion();
 }
 
 /// System responsible for creating a Rapier rigid-body and collider from their
@@ -88,16 +88,6 @@ pub fn create_body_and_collider_system(
     for entity_id in colliders_builder_deleted.iter() {
         collider_builders.delete(*entity_id);
     }
-
-    /* No parents in shipyard
-    for (entity, parent, collider_builder) in parented_collider_query.iter() {
-        if let Some(body_handle) = entity_maps.bodies.get(&parent.0) {
-            let handle = colliders.insert(collider_builder.build(), *body_handle, &mut bodies);
-            commands.insert_one(entity, ColliderHandleComponent::from(handle));
-            commands.remove_one::<ColliderBuilder>(entity);
-            entity_maps.colliders.insert(entity, handle);
-        }
-    } */
 }
 
 #[test]
