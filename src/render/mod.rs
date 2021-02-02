@@ -2,15 +2,21 @@ use crate::physics::{ColliderHandleComponent, RapierConfiguration};
 use macroquad::prelude::*;
 use rapier::dynamics::RigidBodySet;
 use rapier::geometry::{ColliderSet, ShapeType};
+use rapier::pipeline::PhysicsPipeline;
 use shipyard::{Get, IntoIter, IntoWithId, UniqueView, View};
 use std::collections::HashMap;
 
 /// The desired render color of a Rapier collider.
 pub struct RapierRenderColor(pub f32, pub f32, pub f32);
 
+pub fn render_physics_stats(pipeline: UniqueView<PhysicsPipeline>) {
+    let text = format!("Physics time: {:.2}", pipeline.counters.step_time());
+    draw_text(&text, 10.0, 10.0, 30.0, WHITE);
+}
+
 /// System responsible for attaching a PbrBundle to each entity having a collider.
 pub fn render_colliders(
-    configuration: UniqueView<RapierConfiguration>,
+    _configuration: UniqueView<RapierConfiguration>,
     bodies: UniqueView<RigidBodySet>,
     colliders: UniqueView<ColliderSet>,
     colliders_handles: View<ColliderHandleComponent>,

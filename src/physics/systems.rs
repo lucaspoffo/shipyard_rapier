@@ -7,7 +7,6 @@ use crate::physics::{
 use crate::rapier::pipeline::QueryPipeline;
 use rapier::dynamics::{IntegrationParameters, JointSet, RigidBodyBuilder, RigidBodySet};
 use rapier::geometry::{BroadPhase, ColliderBuilder, ColliderSet, NarrowPhase};
-use rapier::math::Isometry;
 use rapier::pipeline::PhysicsPipeline;
 
 use shipyard::{
@@ -268,18 +267,16 @@ pub fn step_world_system(
 }
 
 /*
-
 /// System responsible for removing joints, colliders, and bodies that have
 /// been removed from the scene
 pub fn destroy_body_and_collider_system(
-    commands: &mut Commands,
-    mut bodies: ResMut<RigidBodySet>,
-    mut colliders: ResMut<ColliderSet>,
-    mut joints: ResMut<JointSet>,
-    mut entity_maps: ResMut<EntityMaps>,
-    collider_query: Query<(Entity, &ColliderHandleComponent)>,
-    joint_query: Query<(Entity, &JointHandleComponent)>,
-    body_query: Query<(Entity, &RigidBodyHandleComponent)>,
+    mut bodies: UniqueViewMut<RigidBodySet>,
+    mut colliders: UniqueViewMut<ColliderSet>,
+    mut joints: UniqueViewMut<JointSet>,
+    mut entity_maps: UniqueViewMut<EntityMaps>,
+    collider_handles: ViewMut<ColliderHandleComponent>,
+    joint_handles: ViewMut<JointHandleComponent>,
+    body_handles: ViewMut<RigidBodyHandleComponent>,
 ) {
     // Components removed before this system
     let bodies_removed = body_query.removed::<RigidBodyHandleComponent>();
@@ -312,5 +309,4 @@ pub fn destroy_body_and_collider_system(
         }
     }
 }
-
 */

@@ -1,12 +1,14 @@
 extern crate rapier2d as rapier; // For the debug UI.
 
 use macroquad::prelude::*;
-use shipyard_rapier2d::physics::{RapierConfiguration, resources::EntityMaps, systems::{create_body_and_collider_system, step_world_system,setup}};
-use shipyard_rapier2d::render::render_colliders;
-use rapier2d::dynamics::{RigidBodyBuilder, RigidBodySet};
-use rapier::geometry::{BroadPhase, ColliderBuilder, ColliderSet, NarrowPhase};
+use shipyard_rapier2d::{
+    physics::systems::{create_body_and_collider_system, step_world_system,setup},
+    render::{render_colliders, render_physics_stats}
+};
+use rapier2d::dynamics::RigidBodyBuilder;
+use rapier::geometry::ColliderBuilder;
 use rapier2d::pipeline::PhysicsPipeline;
-use shipyard::{World, UniqueView, UniqueViewMut};
+use shipyard::{World, UniqueViewMut};
 
 #[macroquad::main("Boxes2")]
 async fn main() {
@@ -36,11 +38,8 @@ async fn main() {
         world.run(render_colliders).unwrap();
         
         set_default_camera();
+        world.run(render_physics_stats).unwrap();
 
-        world.run(|pipeline: UniqueView<PhysicsPipeline>| {
-            let text = format!("Physics time: {:.2}", pipeline.counters.step_time());
-            draw_text(&text, 10.0, 10.0, 30.0, WHITE);
-        }).unwrap();
         next_frame().await
     }
 }
