@@ -1,0 +1,28 @@
+[package]
+name = "shipyard_rapier2d"
+version = "0.1.0"
+authors = ["Lucas Poffo <ltkpoffo@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+path = "../src/lib.rs"
+required-features = [ "dim2" ]
+
+[features]
+default = [ "dim2" ]
+dim2 = []
+parallel = [ "rapier2d/parallel" ]
+simd-stable = [ "rapier2d/simd-stable" ]
+simd-nightly = [ "rapier2d/simd-nightly" ]
+wasm-bindgen = [ "rapier2d/wasm-bindgen" ]
+serde-serialize = [ "rapier2d/serde-serialize" ]
+enhanced-determinism = [ "rapier2d/enhanced-determinism" ]
+
+[dependencies]
+shipyard = { git = "https://github.com/leudz/shipyard.git", rev = "a87e59e441d938bd7dc18bebf97456eff8707484" }
+nalgebra = "0.24"
+rapier2d = "0.5"
+macroquad = { version = "=0.3.0-alpha.14", features = [ "log-impl" ] }
+concurrent-queue = "1"

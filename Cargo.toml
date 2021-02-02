@@ -1,0 +1,6 @@
+[workspace]
+members = ["shipyard_rapier2d"]
+
+[profile.release]
+codegen-units = 1
+
