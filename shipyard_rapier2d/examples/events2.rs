@@ -6,17 +6,20 @@ use rapier2d::dynamics::RigidBodyBuilder;
 use rapier2d::pipeline::PhysicsPipeline;
 use shipyard::{UniqueViewMut, World, AllStoragesViewMut};
 use shipyard_rapier2d::{
-    physics::systems::{create_body_and_collider_system, setup_physics, step_world_system},
+    physics::{
+        systems::{create_body_and_collider_system, setup_physics, step_world_system},
+        resources::EventQueue,
+    },
     render::{render_colliders, render_physics_stats},
 };
 
-#[macroquad::main("Boxes 2D")]
+#[macroquad::main("Events 2D")]
 async fn main() {
     let world = World::new();
     world.run(setup_physics).unwrap();
     world.run(setup_physics_world).unwrap();
 
-    let viewport_height = 120.0;
+    let viewport_height = 40.0;
     let aspect = screen_width() / screen_height();
     let viewport_width = viewport_height * aspect;
 
@@ -25,7 +28,7 @@ async fn main() {
             1.0 / viewport_width as f32 * 2.,
             -1.0 / viewport_height as f32 * 2.,
         ),
-        target: vec2(0.0, -50.0),
+        target: vec2(0.0, 0.0),
         ..Default::default()
     };
 
@@ -39,6 +42,7 @@ async fn main() {
         world
             .run_with_data(step_world_system, get_frame_time())
             .unwrap();
+        world.run(display_events).unwrap();
         world.run(render_colliders).unwrap();
 
         set_default_camera();
@@ -48,6 +52,17 @@ async fn main() {
     }
 }
 
+fn display_events(events: UniqueViewMut<EventQueue>) {
+    while let Ok(intersection_event) = events.intersection_events.pop() {
+        println!("Received intersection event: {:?}", intersection_event);
+    }
+
+    while let Ok(contact_event) = events.contact_events.pop() {
+        println!("Received contact event: {:?}", contact_event);
+    }
+}
+
+
 fn enable_physics_profiling(mut pipeline: UniqueViewMut<PhysicsPipeline>) {
     pipeline.counters.enable()
 }
@@ -56,43 +71,15 @@ pub fn setup_physics_world(mut all_storages: AllStoragesViewMut) {
     /*
      * Ground
      */
-    let ground_size = 25.0;
-
     let rigid_body = RigidBodyBuilder::new_static();
-    let collider = ColliderBuilder::cuboid(ground_size, 1.2);
+    let collider = ColliderBuilder::cuboid(4.0, 1.2);
     all_storages.add_entity((rigid_body, collider));
 
-    let rigid_body = RigidBodyBuilder::new_static()
-        .rotation(std::f32::consts::FRAC_PI_2)
-        .translation(ground_size, ground_size * 2.0);
-    let collider = ColliderBuilder::cuboid(ground_size * 2.0, 1.2);
+    let rigid_body = RigidBodyBuilder::new_static().translation(0.0, 5.0);
+    let collider = ColliderBuilder::cuboid(4.0, 1.2).sensor(true);
     all_storages.add_entity((rigid_body, collider));
 
-    let body = RigidBodyBuilder::new_static()
-        .rotation(std::f32::consts::FRAC_PI_2)
-        .translation(-ground_size, ground_size * 2.0);
-    let collider = ColliderBuilder::cuboid(ground_size * 2.0, 1.2);
-    all_storages.add_entity((body, collider));
-
-    /*
-     * Create the cubes
-     */
-    let num = 20;
-    let rad = 0.5;
-
-    let shift = rad * 2.0;
-    let centerx = shift * (num as f32) / 2.0;
-    let centery = shift / 2.0;
-
-    for i in 0..num {
-        for j in 0usize..num * 5 {
-            let x = i as f32 * shift - centerx;
-            let y = j as f32 * shift + centery + 2.0;
-
-            // Build the rigid body.
-            let body = RigidBodyBuilder::new_dynamic().translation(x, y);
-            let collider = ColliderBuilder::cuboid(rad, rad).density(1.0);
-            all_storages.add_entity((body, collider));
-        }
-    }
+    let rigid_body = RigidBodyBuilder::new_dynamic().translation(0.0, 13.0);
+    let collider = ColliderBuilder::cuboid(0.5, 0.5);
+    all_storages.add_entity((rigid_body, collider));
 }

@@ -5,7 +5,7 @@ use nalgebra::Point2;
 use rapier::dynamics::{BallJoint, BodyStatus, RigidBodyBuilder};
 use rapier::geometry::ColliderBuilder;
 use rapier::pipeline::PhysicsPipeline;
-use shipyard::{UniqueViewMut, World};
+use shipyard::{UniqueViewMut, World, AllStoragesViewMut};
 use shipyard_rapier2d::{
     physics::{
         components::JointBuilderComponent,
@@ -18,9 +18,9 @@ use shipyard_rapier2d::{
 
 #[macroquad::main("Joints 2D")]
 async fn main() {
-    let mut world = World::new();
+    let world = World::new();
     world.run(setup_physics).unwrap();
-    setup_physics_world(&mut world);
+    world.run(setup_physics_world).unwrap();
 
     let viewport_height = 60.0;
     let aspect = screen_width() / screen_height();
@@ -59,7 +59,7 @@ fn enable_physics_profiling(mut pipeline: UniqueViewMut<PhysicsPipeline>) {
     pipeline.counters.enable()
 }
 
-pub fn setup_physics_world(world: &mut World) {
+pub fn setup_physics_world(mut all_storages: AllStoragesViewMut) {
     /*
      * Create the balls
      */
@@ -87,13 +87,13 @@ pub fn setup_physics_world(world: &mut World) {
 
             let rigid_body = RigidBodyBuilder::new(status).translation(fk * shift, -fi * shift);
             let collider = ColliderBuilder::cuboid(rad, rad).density(1.0);
-            let child_entity = world.add_entity((rigid_body, collider));
+            let child_entity = all_storages.add_entity((rigid_body, collider));
 
             // Vertical joint.
             if i > 0 {
                 let parent_entity = *body_entities.last().unwrap();
                 let joint = BallJoint::new(Point2::origin(), Point2::new(0.0, shift));
-                world.add_entity((JointBuilderComponent::new(
+                all_storages.add_entity((JointBuilderComponent::new(
                     joint,
                     parent_entity,
                     child_entity,
@@ -105,7 +105,7 @@ pub fn setup_physics_world(world: &mut World) {
                 let parent_index = body_entities.len() - numi;
                 let parent_entity = body_entities[parent_index];
                 let joint = BallJoint::new(Point2::origin(), Point2::new(-shift, 0.0));
-                world.add_entity((JointBuilderComponent::new(
+                all_storages.add_entity((JointBuilderComponent::new(
                     joint,
                     parent_entity,
                     child_entity,

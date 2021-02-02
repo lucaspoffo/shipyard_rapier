@@ -20,10 +20,10 @@ pub struct DespawnResource {
 
 #[macroquad::main("Despawn 2D")]
 async fn main() {
-    let mut world = World::new();
+    let world = World::new();
     world.add_unique(DespawnResource::default()).unwrap();
     world.run(setup_physics).unwrap();
-    setup_physics_world(&mut world);
+    world.run(setup_physics_world).unwrap();
     
     let viewport_height = 120.0;
     let aspect = screen_width() / screen_height();
@@ -61,7 +61,7 @@ fn enable_physics_profiling(mut pipeline: UniqueViewMut<PhysicsPipeline>) {
    pipeline.counters.enable()
 }
 
-pub fn setup_physics_world(world: &mut World) {
+pub fn setup_physics_world(mut all_storages: AllStoragesViewMut) {
     /*
      * Ground
      */
@@ -70,21 +70,21 @@ pub fn setup_physics_world(world: &mut World) {
 
     let rigid_body = RigidBodyBuilder::new_static();
     let collider = ColliderBuilder::cuboid(ground_size, 1.2);
-    let entity = world.add_entity((rigid_body, collider));
+    let entity = all_storages.add_entity((rigid_body, collider));
     despawn_entities.push(entity);
 
     let rigid_body = RigidBodyBuilder::new_static()
         .rotation(std::f32::consts::FRAC_PI_2)
         .translation(ground_size, ground_size * 2.0);
     let collider = ColliderBuilder::cuboid(ground_size * 2.0, 1.2);
-    let entity = world.add_entity((rigid_body, collider));
+    let entity = all_storages.add_entity((rigid_body, collider));
     despawn_entities.push(entity);
 
     let body = RigidBodyBuilder::new_static()
         .rotation(std::f32::consts::FRAC_PI_2)
         .translation(-ground_size, ground_size * 2.0);
     let collider = ColliderBuilder::cuboid(ground_size * 2.0, 1.2);
-    let entity = world.add_entity((body, collider));
+    let entity = all_storages.add_entity((body, collider));
     despawn_entities.push(entity);
 
     /*
@@ -105,11 +105,11 @@ pub fn setup_physics_world(world: &mut World) {
             // Build the rigid body.
             let body = RigidBodyBuilder::new_dynamic().translation(x, y);
             let collider = ColliderBuilder::cuboid(rad, rad).density(1.0);
-            world.add_entity((body, collider));
+            all_storages.add_entity((body, collider));
         }
     }
 
-    let mut despawn = world.borrow::<UniqueViewMut<DespawnResource>>().unwrap();
+    let mut despawn = all_storages.borrow::<UniqueViewMut<DespawnResource>>().unwrap();
     despawn.entities = despawn_entities;
 }
 

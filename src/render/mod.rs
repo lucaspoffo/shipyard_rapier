@@ -11,7 +11,7 @@ pub struct RapierRenderColor(pub f32, pub f32, pub f32);
 
 pub fn render_physics_stats(pipeline: UniqueView<PhysicsPipeline>) {
     let text = format!("Physics time: {:.2}", pipeline.counters.step_time());
-    draw_text(&text, 10.0, 10.0, 30.0, WHITE);
+    draw_text(&text, 10.0, 10.0, 30.0, BLACK);
 }
 
 /// System responsible for attaching a PbrBundle to each entity having a collider.
