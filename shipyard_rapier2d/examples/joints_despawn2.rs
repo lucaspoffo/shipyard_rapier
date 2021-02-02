@@ -22,7 +22,7 @@ pub struct DespawnResource {
     pub entities: Vec<EntityId>,
 }
 
-#[macroquad::main("Joints 2D")]
+#[macroquad::main("Joints Despawn 2D")]
 async fn main() {
     let world = World::new();
     world.run(setup_physics).unwrap();

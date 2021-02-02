@@ -89,7 +89,7 @@ pub fn render_colliders(
                             0.0,
                         );
                         gl.push_model_matrix(glam::Mat4::from_translation(translation));
-                        gl.push_model_matrix(glam::Mat4::from_rotation_z(pos.rotation.angle()));
+                        gl.push_model_matrix(glam::Mat4::from_rotation_z(-pos.rotation.angle()));
 
                         draw_rectangle(
                             -c.half_extents.x,
