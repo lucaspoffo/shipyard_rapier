@@ -10,7 +10,8 @@ use rapier::geometry::{BroadPhase, ColliderBuilder, ColliderSet, NarrowPhase};
 use rapier::pipeline::PhysicsPipeline;
 
 use shipyard::{
-    EntitiesView, Get, IntoIter, IntoWithId, UniqueView, UniqueViewMut, View, ViewMut, AllStoragesViewMut,
+    AllStoragesViewMut, EntitiesView, Get, IntoIter, IntoWithId, UniqueView, UniqueViewMut, View,
+    ViewMut,
 };
 
 pub fn setup_physics(all_storages: AllStoragesViewMut) {
@@ -28,11 +29,17 @@ pub fn setup_physics(all_storages: AllStoragesViewMut) {
     all_storages.add_unique(SimulationToRenderTime::default());
     all_storages.add_unique(EntityMaps::default());
 
-    let mut body_handles = all_storages.borrow::<ViewMut<RigidBodyHandleComponent>>().unwrap();
+    let mut body_handles = all_storages
+        .borrow::<ViewMut<RigidBodyHandleComponent>>()
+        .unwrap();
     body_handles.update_pack();
-    let mut collider_handles = all_storages.borrow::<ViewMut<ColliderHandleComponent>>().unwrap();
+    let mut collider_handles = all_storages
+        .borrow::<ViewMut<ColliderHandleComponent>>()
+        .unwrap();
     collider_handles.update_pack();
-    let mut joint_handles = all_storages.borrow::<ViewMut<JointHandleComponent>>().unwrap();
+    let mut joint_handles = all_storages
+        .borrow::<ViewMut<JointHandleComponent>>()
+        .unwrap();
     joint_handles.update_pack();
 }
 

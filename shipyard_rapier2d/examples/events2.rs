@@ -4,11 +4,11 @@ use macroquad::prelude::*;
 use rapier::geometry::ColliderBuilder;
 use rapier2d::dynamics::RigidBodyBuilder;
 use rapier2d::pipeline::PhysicsPipeline;
-use shipyard::{UniqueViewMut, World, AllStoragesViewMut};
+use shipyard::{AllStoragesViewMut, UniqueViewMut, World};
 use shipyard_rapier2d::{
     physics::{
-        systems::{create_body_and_collider_system, setup_physics, step_world_system},
-        resources::EventQueue,
+        create_body_and_collider_system, create_joints_system, destroy_body_and_collider_system,
+        setup_physics, step_world_system, EventQueue,
     },
     render::{render_colliders, render_physics_stats},
 };
@@ -38,10 +38,14 @@ async fn main() {
         clear_background(WHITE);
         set_camera(camera);
 
+        // Systems to update physics world
         world.run(create_body_and_collider_system).unwrap();
+        world.run(create_joints_system).unwrap();
         world
             .run_with_data(step_world_system, get_frame_time())
             .unwrap();
+        world.run(destroy_body_and_collider_system).unwrap();
+
         world.run(display_events).unwrap();
         world.run(render_colliders).unwrap();
 
@@ -61,7 +65,6 @@ fn display_events(events: UniqueViewMut<EventQueue>) {
         println!("Received contact event: {:?}", contact_event);
     }
 }
-
 
 fn enable_physics_profiling(mut pipeline: UniqueViewMut<PhysicsPipeline>) {
     pipeline.counters.enable()

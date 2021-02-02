@@ -5,9 +5,9 @@ use crate::rapier::{
     },
     pipeline::EventHandler,
 };
-use shipyard::EntityId;
 use concurrent_queue::ConcurrentQueue;
 use rapier::math::Vector;
+use shipyard::EntityId;
 use std::collections::HashMap;
 
 /// A resource for specifying configuration information for the physics simulation
@@ -111,7 +111,7 @@ impl InteractionPairFilters {
 
     /// Sets the custom intersection pair filter.
     pub fn intersection_filter(&mut self, filter: impl IntersectionPairFilter + 'static) {
-        self.intersection_filter =Some(Box::new(filter) as Box<dyn IntersectionPairFilter>);
+        self.intersection_filter = Some(Box::new(filter) as Box<dyn IntersectionPairFilter>);
     }
 }
 
@@ -125,4 +125,3 @@ pub struct EntityMaps {
     /// HashMap of Shipyard Entity to Rapier JointHandle
     pub(crate) joints: HashMap<EntityId, JointHandle>,
 }
- 

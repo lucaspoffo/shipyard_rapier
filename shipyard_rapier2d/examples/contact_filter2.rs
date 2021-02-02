@@ -2,13 +2,13 @@ extern crate rapier2d as rapier; // For the debug UI.
 
 use macroquad::prelude::*;
 use rapier::dynamics::RigidBodyBuilder;
-use rapier::pipeline::PhysicsPipeline;
 use rapier::geometry::{ColliderBuilder, ContactPairFilter, PairFilterContext, SolverFlags};
-use shipyard::{UniqueViewMut, World, AllStoragesViewMut};
+use rapier::pipeline::PhysicsPipeline;
+use shipyard::{AllStoragesViewMut, UniqueViewMut, World};
 use shipyard_rapier2d::{
     physics::{
-        InteractionPairFilters,
-        systems::{create_body_and_collider_system, setup_physics, step_world_system}
+        create_body_and_collider_system, create_joints_system, destroy_body_and_collider_system,
+        setup_physics, step_world_system, InteractionPairFilters,
     },
     render::{render_colliders, render_physics_stats},
 };
@@ -27,7 +27,6 @@ impl ContactPairFilter for SameUserDataFilter {
         }
     }
 }
-
 
 #[macroquad::main("Boxes 2D")]
 async fn main() {
@@ -54,10 +53,14 @@ async fn main() {
         clear_background(WHITE);
         set_camera(camera);
 
+        // Systems to update physics world
         world.run(create_body_and_collider_system).unwrap();
+        world.run(create_joints_system).unwrap();
         world
             .run_with_data(step_world_system, get_frame_time())
             .unwrap();
+        world.run(destroy_body_and_collider_system).unwrap();
+
         world.run(render_colliders).unwrap();
 
         set_default_camera();
@@ -76,7 +79,9 @@ pub fn setup_physics_world(mut all_storages: AllStoragesViewMut) {
      * Ground
      */
     {
-        let mut filters = all_storages.borrow::<UniqueViewMut<InteractionPairFilters>>().unwrap();
+        let mut filters = all_storages
+            .borrow::<UniqueViewMut<InteractionPairFilters>>()
+            .unwrap();
         filters.contact_filter(SameUserDataFilter);
     }
 

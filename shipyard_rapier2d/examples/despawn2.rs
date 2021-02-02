@@ -1,17 +1,17 @@
 extern crate rapier2d as rapier; // For the debug UI.
 
 use macroquad::prelude::*;
-use shipyard_rapier2d::{
-    physics::systems::{
-        create_body_and_collider_system, step_world_system,
-        setup_physics, destroy_body_and_collider_system
-    },
-    render::{render_colliders, render_physics_stats}
-};
-use rapier2d::dynamics::RigidBodyBuilder;
 use rapier::geometry::ColliderBuilder;
+use rapier2d::dynamics::RigidBodyBuilder;
 use rapier2d::pipeline::PhysicsPipeline;
-use shipyard::{World, UniqueViewMut, EntityId, AllStoragesViewMut};
+use shipyard::{AllStoragesViewMut, EntityId, UniqueViewMut, World};
+use shipyard_rapier2d::{
+    physics::{
+        create_body_and_collider_system, create_joints_system, destroy_body_and_collider_system,
+        setup_physics, step_world_system,
+    },
+    render::{render_colliders, render_physics_stats},
+};
 
 #[derive(Default)]
 pub struct DespawnResource {
@@ -21,10 +21,9 @@ pub struct DespawnResource {
 #[macroquad::main("Despawn 2D")]
 async fn main() {
     let world = World::new();
-    world.add_unique(DespawnResource::default()).unwrap();
     world.run(setup_physics).unwrap();
     world.run(setup_physics_world).unwrap();
-    
+
     let viewport_height = 120.0;
     let aspect = screen_width() / screen_height();
     let viewport_width = viewport_height * aspect;
@@ -44,12 +43,18 @@ async fn main() {
         clear_background(WHITE);
         set_camera(camera);
 
+        // Systems to update physics world
         world.run(create_body_and_collider_system).unwrap();
-        world.run_with_data(step_world_system, get_frame_time()).unwrap();
+        world.run(create_joints_system).unwrap();
+        world
+            .run_with_data(step_world_system, get_frame_time())
+            .unwrap();
         world.run(destroy_body_and_collider_system).unwrap();
+
         world.run_with_data(despawn, get_time()).unwrap();
+
         world.run(render_colliders).unwrap();
-        
+
         set_default_camera();
         world.run(render_physics_stats).unwrap();
 
@@ -58,7 +63,7 @@ async fn main() {
 }
 
 fn enable_physics_profiling(mut pipeline: UniqueViewMut<PhysicsPipeline>) {
-   pipeline.counters.enable()
+    pipeline.counters.enable()
 }
 
 pub fn setup_physics_world(mut all_storages: AllStoragesViewMut) {
@@ -109,14 +114,18 @@ pub fn setup_physics_world(mut all_storages: AllStoragesViewMut) {
         }
     }
 
-    let mut despawn = all_storages.borrow::<UniqueViewMut<DespawnResource>>().unwrap();
-    despawn.entities = despawn_entities;
+    let despawn = DespawnResource {
+        entities: despawn_entities,
+    };
+    all_storages.add_unique(despawn);
 }
 
 pub fn despawn(time: f64, mut all_storages: AllStoragesViewMut) {
     if time > 5.0 {
         let despawn_entities = {
-            let mut despawn = all_storages.borrow::<UniqueViewMut<DespawnResource>>().unwrap();
+            let mut despawn = all_storages
+                .borrow::<UniqueViewMut<DespawnResource>>()
+                .unwrap();
             let entities = despawn.entities.clone();
             despawn.entities.clear();
             entities
@@ -127,4 +136,3 @@ pub fn despawn(time: f64, mut all_storages: AllStoragesViewMut) {
         }
     }
 }
-

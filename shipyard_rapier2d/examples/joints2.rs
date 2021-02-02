@@ -5,13 +5,11 @@ use nalgebra::Point2;
 use rapier::dynamics::{BallJoint, BodyStatus, RigidBodyBuilder};
 use rapier::geometry::ColliderBuilder;
 use rapier::pipeline::PhysicsPipeline;
-use shipyard::{UniqueViewMut, World, AllStoragesViewMut};
+use shipyard::{AllStoragesViewMut, UniqueViewMut, World};
 use shipyard_rapier2d::{
     physics::{
-        components::JointBuilderComponent,
-        systems::{
-            create_body_and_collider_system, create_joints_system, setup_physics, step_world_system,
-        },
+        create_body_and_collider_system, create_joints_system, destroy_body_and_collider_system,
+        setup_physics, step_world_system, JointBuilderComponent,
     },
     render::{render_colliders, render_physics_stats},
 };
@@ -41,11 +39,14 @@ async fn main() {
         clear_background(WHITE);
         set_camera(camera);
 
+        // Systems to update physics world
         world.run(create_body_and_collider_system).unwrap();
         world.run(create_joints_system).unwrap();
         world
             .run_with_data(step_world_system, get_frame_time())
             .unwrap();
+        world.run(destroy_body_and_collider_system).unwrap();
+
         world.run(render_colliders).unwrap();
 
         set_default_camera();
