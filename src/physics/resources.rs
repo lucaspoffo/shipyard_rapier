@@ -118,13 +118,13 @@ impl InteractionPairFilters {
 }
 
 /// HashMaps of Bevy Entity to Rapier handles
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct EntityMaps {
-    /// HashMap of Bevy Entity to Rapier RigidBodyHandle
+    /// HashMap of Shipyard Entity to Rapier RigidBodyHandle
     pub(crate) bodies: HashMap<EntityId, RigidBodyHandle>,
-    /// HashMap of Bevy Entity to Rapier ColliderHandle
+    /// HashMap of Shipyard Entity to Rapier ColliderHandle
     pub(crate) colliders: HashMap<EntityId, ColliderHandle>,
-    /// HashMap of Bevy Entity to Rapier JointHandle
+    /// HashMap of Shipyard Entity to Rapier JointHandle
     pub(crate) joints: HashMap<EntityId, JointHandle>,
 }
  

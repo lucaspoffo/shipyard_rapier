@@ -1,25 +1,27 @@
 extern crate rapier2d as rapier; // For the debug UI.
 
 use macroquad::prelude::*;
-use shipyard_rapier2d::{
-    physics::{
-        systems::{create_body_and_collider_system, step_world_system,setup, create_joints_system}, 
-        components::JointBuilderComponent
-    },
-    render::{render_colliders, render_physics_stats}
-};
 use nalgebra::Point2;
-use rapier::dynamics::{BallJoint, BodyStatus,RigidBodyBuilder};
+use rapier::dynamics::{BallJoint, BodyStatus, RigidBodyBuilder};
 use rapier::geometry::ColliderBuilder;
 use rapier::pipeline::PhysicsPipeline;
-use shipyard::{World, UniqueViewMut};
+use shipyard::{UniqueViewMut, World};
+use shipyard_rapier2d::{
+    physics::{
+        components::JointBuilderComponent,
+        systems::{
+            create_body_and_collider_system, create_joints_system, setup, step_world_system,
+        },
+    },
+    render::{render_colliders, render_physics_stats},
+};
 
 #[macroquad::main("Joints 2D")]
 async fn main() {
     let mut world = World::new();
     setup(&mut world);
     setup_physics(&mut world);
-    
+
     let viewport_height = 60.0;
     let aspect = screen_width() / screen_height();
     let viewport_width = viewport_height * aspect;
@@ -36,12 +38,16 @@ async fn main() {
     world.run(enable_physics_profiling).unwrap();
 
     loop {
+        clear_background(WHITE);
         set_camera(camera);
+
         world.run(create_body_and_collider_system).unwrap();
         world.run(create_joints_system).unwrap();
-        world.run_with_data(step_world_system, get_frame_time()).unwrap();
+        world
+            .run_with_data(step_world_system, get_frame_time())
+            .unwrap();
         world.run(render_colliders).unwrap();
-        
+
         set_default_camera();
         world.run(render_physics_stats).unwrap();
 
@@ -110,4 +116,3 @@ pub fn setup_physics(world: &mut World) {
         }
     }
 }
-

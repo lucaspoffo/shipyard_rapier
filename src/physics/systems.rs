@@ -27,6 +27,13 @@ pub fn setup(world: &mut World) {
     world.add_unique(EventQueue::new(true)).unwrap();
     world.add_unique(SimulationToRenderTime::default()).unwrap();
     world.add_unique(EntityMaps::default()).unwrap();
+
+    let mut body_handles = world.borrow::<ViewMut<RigidBodyHandleComponent>>().unwrap();
+    body_handles.update_pack();
+    let mut collider_handles = world.borrow::<ViewMut<ColliderHandleComponent>>().unwrap();
+    collider_handles.update_pack();
+    let mut joint_handles = world.borrow::<ViewMut<JointHandleComponent>>().unwrap();
+    joint_handles.update_pack();
 }
 
 /// System responsible for creating a Rapier rigid-body and collider from their
@@ -266,7 +273,6 @@ pub fn step_world_system(
     }
 }
 
-/*
 /// System responsible for removing joints, colliders, and bodies that have
 /// been removed from the scene
 pub fn destroy_body_and_collider_system(
@@ -274,39 +280,27 @@ pub fn destroy_body_and_collider_system(
     mut colliders: UniqueViewMut<ColliderSet>,
     mut joints: UniqueViewMut<JointSet>,
     mut entity_maps: UniqueViewMut<EntityMaps>,
-    collider_handles: ViewMut<ColliderHandleComponent>,
-    joint_handles: ViewMut<JointHandleComponent>,
-    body_handles: ViewMut<RigidBodyHandleComponent>,
+    mut collider_handles: ViewMut<ColliderHandleComponent>,
+    mut joint_handles: ViewMut<JointHandleComponent>,
+    mut body_handles: ViewMut<RigidBodyHandleComponent>,
 ) {
-    // Components removed before this system
-    let bodies_removed = body_query.removed::<RigidBodyHandleComponent>();
-    let colliders_removed = collider_query.removed::<ColliderHandleComponent>();
-    let joints_removed = joint_query.removed::<JointHandleComponent>();
+    for (entity, body_handle) in body_handles.take_deleted().iter() {
+        bodies.remove(body_handle.0, &mut colliders, &mut joints);
+        entity_maps.bodies.remove(entity);
 
-    for entity in bodies_removed {
-        if let Some(body_handle) = entity_maps.bodies.get(entity) {
-            bodies.remove(*body_handle, &mut colliders, &mut joints);
-            entity_maps.bodies.remove(entity);
-
-            // Removing a body also removes its colliders and joints. If they were
-            // not also removed then we must remove them here.
-            commands.remove_one::<ColliderHandleComponent>(*entity);
-            entity_maps.colliders.remove(entity);
-            commands.remove_one::<JointHandleComponent>(*entity);
-            entity_maps.joints.remove(entity);
-        }
+        // Removing a body also removes its colliders and joints. If they were
+        // not also removed then we must remove them here.
+        joint_handles.delete(*entity);
+        entity_maps.colliders.remove(entity);
+        collider_handles.delete(*entity);
+        entity_maps.joints.remove(entity);
     }
-    for entity in colliders_removed {
-        if let Some(collider_handle) = entity_maps.colliders.get(entity) {
-            colliders.remove(*collider_handle, &mut bodies, true);
-            entity_maps.colliders.remove(entity);
-        }
+    for (entity, collider_handle) in collider_handles.take_deleted().iter() {
+        colliders.remove(collider_handle.0, &mut bodies, true);
+        entity_maps.colliders.remove(entity);
     }
-    for entity in joints_removed {
-        if let Some(joint_handle) = entity_maps.joints.get(entity) {
-            joints.remove(*joint_handle, &mut bodies, true);
-            entity_maps.joints.remove(entity);
-        }
+    for (entity, joint_handle) in joint_handles.take_deleted().iter() {
+        joints.remove(joint_handle.handle, &mut bodies, true);
+        entity_maps.joints.remove(entity);
     }
 }
-*/
