@@ -5,13 +5,13 @@ use nalgebra::Point2;
 use rapier::dynamics::{BallJoint, BodyStatus, RigidBodyBuilder};
 use rapier::geometry::ColliderBuilder;
 use rapier::pipeline::PhysicsPipeline;
-use shipyard::{UniqueViewMut, World, AllStoragesViewMut, EntityId};
+use shipyard::{AllStoragesViewMut, EntityId, UniqueViewMut, World};
 use shipyard_rapier2d::{
     physics::{
         components::JointBuilderComponent,
         systems::{
-            create_body_and_collider_system, create_joints_system, setup_physics, 
-            step_world_system, destroy_body_and_collider_system
+            create_body_and_collider_system, create_joints_system,
+            destroy_body_and_collider_system, setup_physics, step_world_system,
         },
     },
     render::{render_colliders, render_physics_stats},
@@ -50,7 +50,9 @@ async fn main() {
         // Systems to update physics world
         world.run(create_body_and_collider_system).unwrap();
         world.run(create_joints_system).unwrap();
-        world.run_with_data(step_world_system, get_frame_time()).unwrap();
+        world
+            .run_with_data(step_world_system, get_frame_time())
+            .unwrap();
         world.run(destroy_body_and_collider_system).unwrap();
 
         world.run_with_data(despawn, get_time()).unwrap();
@@ -103,10 +105,10 @@ pub fn setup_physics_world(mut all_storages: AllStoragesViewMut) {
                 let parent_entity = *body_entities.last().unwrap();
                 let joint = BallJoint::new(Point2::origin(), Point2::new(0.0, shift));
                 let entity = all_storages.add_entity((JointBuilderComponent::new(
-                        joint,
-                        parent_entity,
-                        child_entity,
-                    ),));
+                    joint,
+                    parent_entity,
+                    child_entity,
+                ),));
                 if i == (numi / 2) || (k % 4 == 0 || k == numk - 1) {
                     despawn_entities.push(entity);
                 }
@@ -118,10 +120,10 @@ pub fn setup_physics_world(mut all_storages: AllStoragesViewMut) {
                 let parent_entity = body_entities[parent_index];
                 let joint = BallJoint::new(Point2::origin(), Point2::new(-shift, 0.0));
                 let entity = all_storages.add_entity((JointBuilderComponent::new(
-                        joint,
-                        parent_entity,
-                        child_entity,
-                    ),));
+                    joint,
+                    parent_entity,
+                    child_entity,
+                ),));
                 if i == (numi / 2) || (k % 4 == 0 || k == numk - 1) {
                     despawn_entities.push(entity);
                 }
@@ -131,14 +133,18 @@ pub fn setup_physics_world(mut all_storages: AllStoragesViewMut) {
         }
     }
 
-    let despawn = DespawnResource { entities: despawn_entities };
+    let despawn = DespawnResource {
+        entities: despawn_entities,
+    };
     all_storages.add_unique(despawn);
 }
 
 pub fn despawn(time: f64, mut all_storages: AllStoragesViewMut) {
     if time > 5.0 {
         let despawn_entities = {
-            let mut despawn = all_storages.borrow::<UniqueViewMut<DespawnResource>>().unwrap();
+            let mut despawn = all_storages
+                .borrow::<UniqueViewMut<DespawnResource>>()
+                .unwrap();
             let entities = despawn.entities.clone();
             despawn.entities.clear();
             entities

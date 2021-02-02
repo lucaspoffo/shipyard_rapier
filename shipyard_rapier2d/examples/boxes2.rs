@@ -6,7 +6,7 @@ use rapier2d::dynamics::RigidBodyBuilder;
 use rapier2d::pipeline::PhysicsPipeline;
 use shipyard::{AllStoragesViewMut, UniqueViewMut, World};
 use shipyard_rapier2d::{
-    physics::systems::{
+    physics::{
         create_body_and_collider_system, create_joints_system, destroy_body_and_collider_system,
         setup_physics, step_world_system,
     },

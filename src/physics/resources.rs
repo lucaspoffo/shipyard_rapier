@@ -119,9 +119,9 @@ impl InteractionPairFilters {
 #[derive(Default, Debug)]
 pub struct EntityMaps {
     /// HashMap of Shipyard Entity to Rapier RigidBodyHandle
-    pub(crate) bodies: HashMap<EntityId, RigidBodyHandle>,
+    pub bodies: HashMap<EntityId, RigidBodyHandle>,
     /// HashMap of Shipyard Entity to Rapier ColliderHandle
-    pub(crate) colliders: HashMap<EntityId, ColliderHandle>,
+    pub colliders: HashMap<EntityId, ColliderHandle>,
     /// HashMap of Shipyard Entity to Rapier JointHandle
-    pub(crate) joints: HashMap<EntityId, JointHandle>,
+    pub joints: HashMap<EntityId, JointHandle>,
 }
