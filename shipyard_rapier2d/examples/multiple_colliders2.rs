@@ -5,13 +5,13 @@ use rapier2d::{
     pipeline::PhysicsPipeline,
 };
 use shipyard::{
-    AllStoragesViewMut, EntitiesView, EntityId, IntoIter, IntoWithId, UniqueViewMut, View, ViewMut,
-    World, Get
+    AllStoragesViewMut, EntitiesView, EntityId, Get, IntoIter, IntoWithId, UniqueViewMut, View,
+    ViewMut, World,
 };
 use shipyard_rapier2d::{
     physics::{
         create_body_and_collider_system, create_joints_system, destroy_body_and_collider_system,
-            setup_physics, step_world_system, ColliderHandleComponent, RigidBodyHandleComponent
+        setup_physics, step_world_system, ColliderHandleComponent, RigidBodyHandleComponent,
     },
     render::{render_colliders, render_physics_stats},
 };
@@ -128,22 +128,17 @@ pub fn create_child_collider_system(
     body_handles: View<RigidBodyHandleComponent>,
     childs: View<Child>,
 ) {
-    let mut colliders_builder_deleted = vec![];
-
     for (entity_id, (child, collider_builder)) in (&childs, &collider_builders).iter().with_id() {
-        
         if let Ok(body_handle) = body_handles.get(child.parent) {
-            let handle = colliders.insert(collider_builder.build(), body_handle.handle(), &mut bodies);
+            let handle =
+                colliders.insert(collider_builder.build(), body_handle.handle(), &mut bodies);
             entities.add_component(
                 entity_id,
                 &mut collider_handles,
                 ColliderHandleComponent::from(handle),
             );
-            colliders_builder_deleted.push(entity_id);
         }
     }
 
-    for entity_id in &colliders_builder_deleted {
-        collider_builders.delete(*entity_id);
-    }
+    collider_builders.clear();
 }
