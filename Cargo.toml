@@ -1,5 +1,5 @@
 [workspace]
-members = ["shipyard_rapier2d"]
+members = ["shipyard_rapier2d", "shipyard_rapier3d"]
 
 [profile.release]
 codegen-units = 1

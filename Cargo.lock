@@ -633,6 +633,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "parry3d"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fdb2522f252566f695839c0280aa478abf6dd6360fd4e729810b6bc635e8cf4e"
+dependencies = [
+ "approx",
+ "bitflags",
+ "downcast-rs",
+ "either",
+ "erased-serde",
+ "indexmap",
+ "nalgebra",
+ "num-derive",
+ "num-traits",
+ "rustc-hash",
+ "serde",
+ "simba",
+ "slab",
+ "smallvec",
+]
+
+[[package]]
 name = "paste"
 version = "1.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -768,6 +790,32 @@ dependencies = [
  "num-derive",
  "num-traits",
  "parry2d",
+ "rayon",
+ "rustc-hash",
+ "serde",
+ "simba",
+ "vec_map",
+]
+
+[[package]]
+name = "rapier3d"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c0f32c214cc33e884f3e52ba38cdf81c402cc984840be1bc69cbb5e47aefcae7"
+dependencies = [
+ "approx",
+ "arrayvec",
+ "bit-vec",
+ "bitflags",
+ "crossbeam",
+ "downcast-rs",
+ "erased-serde",
+ "generational-arena",
+ "instant",
+ "nalgebra",
+ "num-derive",
+ "num-traits",
+ "parry3d",
  "rayon",
  "rustc-hash",
  "serde",
@@ -979,6 +1027,17 @@ dependencies = [
  "macroquad",
  "nalgebra",
  "rapier2d",
+ "shipyard",
+]
+
+[[package]]
+name = "shipyard_rapier3d"
+version = "0.1.0"
+dependencies = [
+ "concurrent-queue",
+ "macroquad",
+ "nalgebra",
+ "rapier3d",
  "shipyard",
 ]
 
