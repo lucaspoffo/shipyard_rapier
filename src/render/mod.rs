@@ -1,7 +1,7 @@
 use crate::physics::{ColliderHandleComponent, RapierConfiguration};
 use macroquad::prelude::*;
 use rapier::dynamics::RigidBodySet;
-use rapier::geometry::{ColliderSet, ShapeType};
+use rapier::geometry::{Collider, ColliderSet, ShapeType};
 use rapier::pipeline::PhysicsPipeline;
 use shipyard::{Get, IntoIter, IntoWithId, UniqueView, View};
 use std::collections::HashMap;
@@ -46,8 +46,12 @@ const GROUND_COLOR: Color = Color::new(
 );
 
 pub fn render_physics_stats(pipeline: UniqueView<PhysicsPipeline>) {
-    let text = format!("Physics time: {:.2}", pipeline.counters.step_time());
-    draw_text(&text, 10.0, 10.0, 30.0, BLACK);
+    let physics_time = format!("Physics time: {:.2}", pipeline.counters.step_time());
+    let frame_time = format!("Frame time: {:.2}", get_frame_time() * 1000.);
+    let fps = format!("FPS: {}", get_fps());
+    draw_text(&physics_time, 10.0, 10.0, 30.0, BLACK);
+    draw_text(&frame_time, 10.0, 30.0, 30.0, BLACK);
+    draw_text(&fps, 10.0, 50.0, 30.0, BLACK);
 }
 
 /// System responsible for attaching a PbrBundle to each entity having a collider.
@@ -60,7 +64,6 @@ pub fn render_colliders(
 ) {
     let mut icolor = 0;
     let mut body_colors = HashMap::new();
-    let scale = Vec3::one() * configuration.scale;
 
     let gl = unsafe { get_internal_gl().quad_gl };
 
@@ -76,87 +79,107 @@ pub fn render_colliders(
                     })
                 };
 
-                let shape = collider.shape();
-
                 let debug_color = debug_colors.get(entity).ok();
 
                 let color = debug_color
                     .map(|c| Color::new(c.0, c.1, c.2, 1.0))
                     .unwrap_or(default_color);
 
-                let pos = collider.position();
-                let translation =
-                    glam::Vec3::new(pos.translation.vector.x, -pos.translation.vector.y, 0.0)
-                        * configuration.scale;
-
-                #[cfg(feature = "dim2")]
-                match shape.shape_type() {
-                    ShapeType::Cuboid => {
-                        let c = shape.as_cuboid().unwrap();
-                        gl.push_model_matrix(glam::Mat4::from_translation(translation));
-                        gl.push_model_matrix(glam::Mat4::from_rotation_z(-pos.rotation.angle()));
-                        gl.push_model_matrix(glam::Mat4::from_scale(scale));
-
-                        draw_rectangle(
-                            -c.half_extents.x,
-                            -c.half_extents.y,
-                            c.half_extents.x * 2.0,
-                            c.half_extents.y * 2.0,
-                            color,
-                        );
-                        gl.pop_model_matrix();
-                        gl.pop_model_matrix();
-                        gl.pop_model_matrix();
-                    }
-                    ShapeType::Ball => {
-                        let b = shape.as_ball().unwrap();
-                        gl.push_model_matrix(glam::Mat4::from_translation(translation));
-                        gl.push_model_matrix(glam::Mat4::from_rotation_z(-pos.rotation.angle()));
-                        gl.push_model_matrix(glam::Mat4::from_scale(scale));
-
-                        draw_circle(0.0, 0.0, b.radius, color);
-
-                        gl.pop_model_matrix();
-                        gl.pop_model_matrix();
-                        gl.pop_model_matrix();
-                    }
-                    _ => continue,
-                };
-                #[cfg(feature = "dim3")]
-                match shape.shape_type() {
-                    ShapeType::Cuboid => {
-                        let c = shape.as_cuboid().unwrap();
-
-                        let size =
-                            Vec3::new(c.half_extents.x, c.half_extents.y, c.half_extents.z) * 2.0;
-
-                        let translation = glam::Vec3::new(
-                            pos.translation.vector.x,
-                            pos.translation.vector.y,
-                            pos.translation.vector.z,
-                        ) * configuration.scale;
-
-                        let quat = glam::Quat::from_xyzw(
-                            pos.rotation.i,
-                            pos.rotation.j,
-                            pos.rotation.k,
-                            pos.rotation.w,
-                        );
-
-                        gl.push_model_matrix(glam::Mat4::from_scale_rotation_translation(
-                            scale,
-                            quat,
-                            translation,
-                        ));
-
-                        draw_cube(Vec3::zero(), size, None, color);
-                        draw_cube_wires(Vec3::zero(), size, WIRE_COLOR);
-
-                        gl.pop_model_matrix();
-                    }
-                    _ => continue,
-                }
+                render_colider(collider, color, configuration.scale, gl);
             }
         }
+    }
+}
+
+#[cfg(feature = "dim2")]
+fn render_colider(collider: &Collider, color: Color, scale: f32, gl: &mut QuadGl) {
+    let pos = collider.position();
+    let shape = collider.shape();
+
+    let translation =
+        glam::Vec3::new(pos.translation.vector.x, -pos.translation.vector.y, 0.0) * scale;
+    match shape.shape_type() {
+        ShapeType::Cuboid => {
+            let c = shape.as_cuboid().unwrap();
+            gl.push_model_matrix(glam::Mat4::from_translation(translation));
+            gl.push_model_matrix(glam::Mat4::from_rotation_z(-pos.rotation.angle()));
+            gl.push_model_matrix(glam::Mat4::from_scale(Vec3::one() * scale));
+
+            draw_rectangle(
+                -c.half_extents.x,
+                -c.half_extents.y,
+                c.half_extents.x * 2.0,
+                c.half_extents.y * 2.0,
+                color,
+            );
+            gl.pop_model_matrix();
+            gl.pop_model_matrix();
+            gl.pop_model_matrix();
+        }
+        ShapeType::Ball => {
+            let b = shape.as_ball().unwrap();
+            gl.push_model_matrix(glam::Mat4::from_translation(translation));
+            gl.push_model_matrix(glam::Mat4::from_rotation_z(-pos.rotation.angle()));
+            gl.push_model_matrix(glam::Mat4::from_scale(Vec3::one() * scale));
+
+            draw_circle(0.0, 0.0, b.radius, color);
+
+            gl.pop_model_matrix();
+            gl.pop_model_matrix();
+            gl.pop_model_matrix();
+        }
+        _ => {}
+    };
+}
+
+#[cfg(feature = "dim3")]
+fn render_colider(collider: &Collider, color: Color, scale: f32, gl: &mut QuadGl) {
+    let pos = collider.position();
+    let shape = collider.shape();
+    let translation = glam::Vec3::new(
+        pos.translation.vector.x,
+        pos.translation.vector.y,
+        pos.translation.vector.z,
+    ) * scale;
+    let quat = glam::Quat::from_xyzw(
+        pos.rotation.i,
+        pos.rotation.j,
+        pos.rotation.k,
+        pos.rotation.w,
+    );
+
+    match shape.shape_type() {
+        ShapeType::Cuboid => {
+            let c = shape.as_cuboid().unwrap();
+
+            let size = Vec3::new(c.half_extents.x, c.half_extents.y, c.half_extents.z) * 2.0;
+
+            gl.push_model_matrix(glam::Mat4::from_scale_rotation_translation(
+                Vec3::one() * scale,
+                quat,
+                translation,
+            ));
+
+            draw_cube(Vec3::zero(), size, None, color);
+            draw_cube_wires(Vec3::zero(), size, WIRE_COLOR);
+
+            gl.pop_model_matrix();
+        }
+        ShapeType::Ball => {
+            let b = shape.as_ball().unwrap();
+
+            gl.push_model_matrix(glam::Mat4::from_scale_rotation_translation(
+                Vec3::one() * scale,
+                quat,
+                translation,
+            ));
+
+            let radius = b.radius * scale;
+
+            draw_sphere(Vec3::zero(), radius, None, color);
+
+            gl.pop_model_matrix();
+        }
+        _ => {},
     }
 }

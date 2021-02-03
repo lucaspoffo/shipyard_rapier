@@ -144,7 +144,7 @@ fn render_player_position(
         if let Some(rb) = rigid_bodies.get(rigid_body_component.handle()) {
             let pos = rb.position();
             let text = format!("Player: ({}, {})", pos.translation.x, pos.translation.y);
-            draw_text(&text, 10.0, 40.0, 30.0, BLACK);
+            draw_text(&text, 10.0, 70.0, 30.0, BLACK);
         }
     }
 }
