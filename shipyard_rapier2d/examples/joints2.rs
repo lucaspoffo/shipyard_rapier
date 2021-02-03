@@ -87,7 +87,7 @@ pub fn setup_physics_world(mut all_storages: AllStoragesViewMut) {
             };
 
             let rigid_body = RigidBodyBuilder::new(status).translation(fk * shift, -fi * shift);
-            let collider = ColliderBuilder::cuboid(rad, rad).density(1.0);
+            let collider = ColliderBuilder::ball(rad).density(1.0);
             let child_entity = all_storages.add_entity((rigid_body, collider));
 
             // Vertical joint.

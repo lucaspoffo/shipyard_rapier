@@ -179,7 +179,6 @@ pub fn step_world_system(
                 if sim_to_render_time.diff - sim_dt < sim_dt {
                     // This is the last simulation step to be executed in the loop
                     // Update the previous state transforms
-                    // for (body_handle, mut previous_state) in query.iter_mut() {
                     for (body_handle, mut previous_state) in
                         (&rigid_bodies_handles, &mut physics_interpolation).iter()
                     {
@@ -224,7 +223,7 @@ pub fn step_world_system(
 }
 
 /// System responsible for removing joints, colliders, and bodies that have
-/// been removed from the scene
+/// been removed from the shipyard World.
 pub fn destroy_body_and_collider_system(
     mut bodies: UniqueViewMut<RigidBodySet>,
     mut colliders: UniqueViewMut<ColliderSet>,

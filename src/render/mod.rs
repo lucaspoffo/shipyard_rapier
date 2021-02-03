@@ -32,10 +32,10 @@ const PALLETE: [Color; 3] = [
 
 #[allow(dead_code)]
 const WIRE_COLOR: Color = Color::new(
-        0x0e as f32 / 255.0,
-        0x2c as f32 / 255.0,
-        0x33 as f32 / 255.0,
-        1.0,
+    0x0e as f32 / 255.0,
+    0x2c as f32 / 255.0,
+    0x33 as f32 / 255.0,
+    1.0,
 );
 
 const GROUND_COLOR: Color = Color::new(
@@ -85,19 +85,15 @@ pub fn render_colliders(
                     .unwrap_or(default_color);
 
                 let pos = collider.position();
+                let translation =
+                    glam::Vec3::new(pos.translation.vector.x, -pos.translation.vector.y, 0.0)
+                        * configuration.scale;
 
                 #[cfg(feature = "dim2")]
                 match shape.shape_type() {
                     ShapeType::Cuboid => {
                         let c = shape.as_cuboid().unwrap();
-                        let translation = glam::Vec3::new(
-                            pos.translation.vector.x,
-                            -pos.translation.vector.y,
-                            0.0,
-                        );
-                        gl.push_model_matrix(glam::Mat4::from_translation(
-                            translation * configuration.scale,
-                        ));
+                        gl.push_model_matrix(glam::Mat4::from_translation(translation));
                         gl.push_model_matrix(glam::Mat4::from_rotation_z(-pos.rotation.angle()));
                         gl.push_model_matrix(glam::Mat4::from_scale(scale));
 
@@ -108,6 +104,18 @@ pub fn render_colliders(
                             c.half_extents.y * 2.0,
                             color,
                         );
+                        gl.pop_model_matrix();
+                        gl.pop_model_matrix();
+                        gl.pop_model_matrix();
+                    }
+                    ShapeType::Ball => {
+                        let b = shape.as_ball().unwrap();
+                        gl.push_model_matrix(glam::Mat4::from_translation(translation));
+                        gl.push_model_matrix(glam::Mat4::from_rotation_z(-pos.rotation.angle()));
+                        gl.push_model_matrix(glam::Mat4::from_scale(scale));
+
+                        draw_circle(0.0, 0.0, b.radius, color);
+
                         gl.pop_model_matrix();
                         gl.pop_model_matrix();
                         gl.pop_model_matrix();
