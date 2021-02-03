@@ -16,7 +16,7 @@ pub fn render_physics_stats(pipeline: UniqueView<PhysicsPipeline>) {
 
 /// System responsible for attaching a PbrBundle to each entity having a collider.
 pub fn render_colliders(
-    _configuration: UniqueView<RapierConfiguration>,
+    configuration: UniqueView<RapierConfiguration>,
     bodies: UniqueView<RigidBodySet>,
     colliders: UniqueView<ColliderSet>,
     colliders_handles: View<ColliderHandleComponent>,
@@ -52,6 +52,11 @@ pub fn render_colliders(
 
     let mut icolor = 0;
     let mut body_colors = HashMap::new();
+    let scale = Vec3::new(
+        configuration.scale,
+        configuration.scale,
+        configuration.scale,
+    );
 
     let gl = unsafe { get_internal_gl().quad_gl };
 
@@ -88,8 +93,11 @@ pub fn render_colliders(
                             -pos.translation.vector.y,
                             0.0,
                         );
-                        gl.push_model_matrix(glam::Mat4::from_translation(translation));
+                        gl.push_model_matrix(glam::Mat4::from_translation(
+                            translation * configuration.scale,
+                        ));
                         gl.push_model_matrix(glam::Mat4::from_rotation_z(-pos.rotation.angle()));
+                        gl.push_model_matrix(glam::Mat4::from_scale(scale));
 
                         draw_rectangle(
                             -c.half_extents.x,
@@ -98,6 +106,7 @@ pub fn render_colliders(
                             c.half_extents.y * 2.0,
                             color,
                         );
+                        gl.pop_model_matrix();
                         gl.pop_model_matrix();
                         gl.pop_model_matrix();
                         // Mesh::from(shape::Quad { size: Vec2::new(2.0, 2.0), flip: false })
