@@ -1,5 +1,5 @@
 use crate::physics::{
-    ColliderHandleComponent, EntityMaps, EventQueue, InteractionPairFilters, JointBuilderComponent,
+    ColliderHandleComponent, EventQueue, InteractionPairFilters, JointBuilderComponent,
     JointHandleComponent, PhysicsInterpolationComponent, RapierConfiguration,
     RigidBodyHandleComponent, SimulationToRenderTime,
 };
@@ -27,7 +27,6 @@ pub fn setup_physics(all_storages: AllStoragesViewMut) {
     all_storages.add_unique(InteractionPairFilters::new());
     all_storages.add_unique(EventQueue::new(true));
     all_storages.add_unique(SimulationToRenderTime::default());
-    all_storages.add_unique(EntityMaps::default());
 
     let mut body_handles = all_storages
         .borrow::<ViewMut<RigidBodyHandleComponent>>()
@@ -49,7 +48,6 @@ pub fn create_body_and_collider_system(
     entities: EntitiesView,
     mut bodies: UniqueViewMut<RigidBodySet>,
     mut colliders: UniqueViewMut<ColliderSet>,
-    mut entity_maps: UniqueViewMut<EntityMaps>,
     mut rigid_body_builders: ViewMut<RigidBodyBuilder>,
     mut rigid_body_handles: ViewMut<RigidBodyHandleComponent>,
     mut collider_builders: ViewMut<ColliderBuilder>,
@@ -66,7 +64,6 @@ pub fn create_body_and_collider_system(
             RigidBodyHandleComponent::from(handle),
         );
         rigid_bodies_builder_deleted.push(entity_id);
-        entity_maps.bodies.insert(entity_id, handle);
 
         if let Ok(collider_builder) = collider_builders.get(entity_id) {
             let collider = collider_builder.build();
@@ -77,7 +74,6 @@ pub fn create_body_and_collider_system(
                 ColliderHandleComponent::from(handle),
             );
             colliders_builder_deleted.push(entity_id);
-            entity_maps.colliders.insert(entity_id, handle);
         }
     }
 
@@ -98,7 +94,6 @@ fn test_create_body_and_collider_system() {
 
     world.add_unique(RigidBodySet::new()).unwrap();
     world.add_unique(ColliderSet::new()).unwrap();
-    world.add_unique(EntityMaps::default()).unwrap();
 
     let body_and_collider_entity =
         world.add_entity((RigidBodyBuilder::new_dynamic(), ColliderBuilder::ball(1.0)));
@@ -109,24 +104,15 @@ fn test_create_body_and_collider_system() {
 
     let body_set = world.borrow::<UniqueView<RigidBodySet>>().unwrap();
     let collider_set = world.borrow::<UniqueView<ColliderSet>>().unwrap();
-    let entity_maps = world.borrow::<UniqueView<EntityMaps>>().unwrap();
 
-    let (rigid_bodies_handles, colliders_handles) = world
-        .borrow::<(
-            ViewMut<RigidBodyHandleComponent>,
-            ViewMut<ColliderHandleComponent>,
-        )>()
-        .unwrap();
+    let rigid_bodies_handles = world.borrow::<ViewMut<RigidBodyHandleComponent>>().unwrap();
+    let colliders_handles = world.borrow::<ViewMut<ColliderHandleComponent>>().unwrap();
 
     // body attached alongside collider
     let attached_body_handle = rigid_bodies_handles
         .get(body_and_collider_entity)
         .unwrap()
         .handle();
-    assert_eq!(
-        entity_maps.bodies[&body_and_collider_entity],
-        attached_body_handle
-    );
     assert!(body_set.get(attached_body_handle).unwrap().is_dynamic());
 
     // collider attached from same entity
@@ -134,20 +120,12 @@ fn test_create_body_and_collider_system() {
         .get(body_and_collider_entity)
         .unwrap()
         .handle();
-    assert_eq!(
-        entity_maps.colliders[&body_and_collider_entity],
-        collider_handle
-    );
     let collider = collider_set.get(collider_handle).unwrap();
     assert_eq!(attached_body_handle, collider.parent());
     assert_eq!(collider.shape().as_ball().unwrap().radius, 1.0);
 
     // standalone body with no collider, jointed to the attached body
     let standalone_body_handle = rigid_bodies_handles.get(body_only_entity).unwrap().handle();
-    assert_eq!(
-        entity_maps.bodies[&body_only_entity],
-        standalone_body_handle
-    );
     assert!(body_set.get(standalone_body_handle).unwrap().is_static());
 }
 
@@ -156,7 +134,6 @@ pub fn create_joints_system(
     entities: EntitiesView,
     mut bodies: UniqueViewMut<RigidBodySet>,
     mut joints: UniqueViewMut<JointSet>,
-    mut entity_maps: UniqueViewMut<EntityMaps>,
     mut joint_builders: ViewMut<JointBuilderComponent>,
     mut joint_handles: ViewMut<JointHandleComponent>,
     bodies_handles: View<RigidBodyHandleComponent>,
@@ -179,7 +156,6 @@ pub fn create_joints_system(
             );
 
             joint_builders_deleted.push(entity_id);
-            entity_maps.joints.insert(entity_id, handle);
         }
     }
 
@@ -276,28 +252,24 @@ pub fn destroy_body_and_collider_system(
     mut bodies: UniqueViewMut<RigidBodySet>,
     mut colliders: UniqueViewMut<ColliderSet>,
     mut joints: UniqueViewMut<JointSet>,
-    mut entity_maps: UniqueViewMut<EntityMaps>,
     mut collider_handles: ViewMut<ColliderHandleComponent>,
     mut joint_handles: ViewMut<JointHandleComponent>,
     mut body_handles: ViewMut<RigidBodyHandleComponent>,
 ) {
     for (entity, body_handle) in body_handles.take_deleted().iter() {
         bodies.remove(body_handle.0, &mut colliders, &mut joints);
-        entity_maps.bodies.remove(entity);
 
         // Removing a body also removes its colliders and joints. If they were
         // not also removed then we must remove them here.
         joint_handles.delete(*entity);
-        entity_maps.colliders.remove(entity);
         collider_handles.delete(*entity);
-        entity_maps.joints.remove(entity);
     }
-    for (entity, collider_handle) in collider_handles.take_deleted().iter() {
+
+    for (_, collider_handle) in collider_handles.take_deleted().iter() {
         colliders.remove(collider_handle.0, &mut bodies, true);
-        entity_maps.colliders.remove(entity);
     }
-    for (entity, joint_handle) in joint_handles.take_deleted().iter() {
+
+    for (_, joint_handle) in joint_handles.take_deleted().iter() {
         joints.remove(joint_handle.handle, &mut bodies, true);
-        entity_maps.joints.remove(entity);
     }
 }

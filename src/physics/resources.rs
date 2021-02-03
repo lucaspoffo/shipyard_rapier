@@ -1,14 +1,9 @@
 use crate::rapier::{
-    dynamics::{JointHandle, RigidBodyHandle},
-    geometry::{
-        ColliderHandle, ContactEvent, ContactPairFilter, IntersectionEvent, IntersectionPairFilter,
-    },
+    geometry::{ContactEvent, ContactPairFilter, IntersectionEvent, IntersectionPairFilter},
     pipeline::EventHandler,
 };
 use concurrent_queue::ConcurrentQueue;
 use rapier::math::Vector;
-use shipyard::EntityId;
-use std::collections::HashMap;
 
 /// A resource for specifying configuration information for the physics simulation
 pub struct RapierConfiguration {
@@ -113,15 +108,4 @@ impl InteractionPairFilters {
     pub fn intersection_filter(&mut self, filter: impl IntersectionPairFilter + 'static) {
         self.intersection_filter = Some(Box::new(filter) as Box<dyn IntersectionPairFilter>);
     }
-}
-
-/// HashMaps of Bevy Entity to Rapier handles
-#[derive(Default, Debug)]
-pub struct EntityMaps {
-    /// HashMap of Shipyard Entity to Rapier RigidBodyHandle
-    pub bodies: HashMap<EntityId, RigidBodyHandle>,
-    /// HashMap of Shipyard Entity to Rapier ColliderHandle
-    pub colliders: HashMap<EntityId, ColliderHandle>,
-    /// HashMap of Shipyard Entity to Rapier JointHandle
-    pub joints: HashMap<EntityId, JointHandle>,
 }

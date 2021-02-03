@@ -10,7 +10,7 @@ use shipyard::EntityId;
 
 /// A component representing a rigid-body that is being handled by
 /// a Rapier physics World.
-pub struct RigidBodyHandleComponent(pub(crate) RigidBodyHandle);
+pub struct RigidBodyHandleComponent(pub RigidBodyHandle);
 
 impl From<RigidBodyHandle> for RigidBodyHandleComponent {
     fn from(handle: RigidBodyHandle) -> Self {
@@ -29,7 +29,7 @@ impl RigidBodyHandleComponent {
 
 /// A component representing a collider that is being handled by
 /// a Rapier physics World.
-pub struct ColliderHandleComponent(pub(crate) ColliderHandle);
+pub struct ColliderHandleComponent(pub ColliderHandle);
 
 impl From<ColliderHandle> for ColliderHandleComponent {
     fn from(handle: ColliderHandle) -> Self {
@@ -127,12 +127,10 @@ impl PhysicsInterpolationComponent {
 
     /// Create a new PhysicsInterpolationComponent from a translation and rotation
     #[cfg(feature = "dim3")]
-    pub fn new(translation: Vector<f32>, rotation: Quat) -> Self {
+    pub fn new(translation: Vector<f32>, rotation: Quaternion<f32>) -> Self {
         Self(Some(Isometry::from_parts(
             Translation::from(translation),
-            UnitQuaternion::from_quaternion(Quaternion::new(
-                rotation.x, rotation.y, rotation.z, rotation.w,
-            )),
+            UnitQuaternion::from_quaternion(rotation),
         )))
     }
 }
