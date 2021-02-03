@@ -28,18 +28,18 @@ pub fn setup_physics(all_storages: AllStoragesViewMut) {
     all_storages.add_unique(EventQueue::new(true));
     all_storages.add_unique(SimulationToRenderTime::default());
 
-    let mut body_handles = all_storages
+    all_storages
         .borrow::<ViewMut<RigidBodyHandleComponent>>()
-        .unwrap();
-    body_handles.track_deletion();
-    let mut collider_handles = all_storages
+        .unwrap()
+        .track_deletion();
+    all_storages
         .borrow::<ViewMut<ColliderHandleComponent>>()
-        .unwrap();
-    collider_handles.track_deletion();
-    let mut joint_handles = all_storages
+        .unwrap()
+        .track_deletion();
+    all_storages
         .borrow::<ViewMut<JointHandleComponent>>()
-        .unwrap();
-    joint_handles.track_deletion();
+        .unwrap()
+        .track_deletion();
 }
 
 /// System responsible for creating a Rapier rigid-body and collider from their
@@ -53,37 +53,19 @@ pub fn create_body_and_collider_system(
     mut collider_builders: ViewMut<ColliderBuilder>,
     mut collider_handles: ViewMut<ColliderHandleComponent>,
 ) {
-    let mut rigid_bodies_builder_deleted = vec![];
-    let mut colliders_builder_deleted = vec![];
-
     for (entity_id, body_builder) in rigid_body_builders.iter().with_id() {
         let handle = bodies.insert(body_builder.build());
-        entities.add_component(
-            entity_id,
-            &mut rigid_body_handles,
-            RigidBodyHandleComponent::from(handle),
-        );
-        rigid_bodies_builder_deleted.push(entity_id);
+        entities.add_component(entity_id, &mut rigid_body_handles, handle.into());
 
         if let Ok(collider_builder) = collider_builders.get(entity_id) {
             let collider = collider_builder.build();
             let handle = colliders.insert(collider, handle, &mut bodies);
-            entities.add_component(
-                entity_id,
-                &mut collider_handles,
-                ColliderHandleComponent::from(handle),
-            );
-            colliders_builder_deleted.push(entity_id);
+            entities.add_component(entity_id, &mut collider_handles, handle.into());
+            collider_builders.delete(entity_id);
         }
     }
 
-    for entity_id in rigid_bodies_builder_deleted.iter() {
-        rigid_body_builders.delete(*entity_id);
-    }
-
-    for entity_id in colliders_builder_deleted.iter() {
-        collider_builders.delete(*entity_id);
-    }
+    rigid_body_builders.clear();
 }
 
 #[test]
@@ -138,7 +120,6 @@ pub fn create_joints_system(
     mut joint_handles: ViewMut<JointHandleComponent>,
     bodies_handles: View<RigidBodyHandleComponent>,
 ) {
-    let mut joint_builders_deleted = vec![];
     for (entity_id, joint_builder) in joint_builders.iter().with_id() {
         let body1 = bodies_handles.get(joint_builder.entity1);
         let body2 = bodies_handles.get(joint_builder.entity2);
@@ -154,14 +135,10 @@ pub fn create_joints_system(
                 &mut joint_handles,
                 JointHandleComponent::new(handle, joint_builder.entity1, joint_builder.entity2),
             );
-
-            joint_builders_deleted.push(entity_id);
         }
     }
 
-    for entity_id in joint_builders_deleted.iter() {
-        joint_builders.delete(*entity_id);
-    }
+    joint_builders.clear();
 }
 
 /// System responsible for performing one timestep of the physics world.
@@ -264,11 +241,9 @@ pub fn destroy_body_and_collider_system(
         joint_handles.delete(*entity);
         collider_handles.delete(*entity);
     }
-
     for (_, collider_handle) in collider_handles.take_deleted().iter() {
         colliders.remove(collider_handle.handle(), &mut bodies, true);
     }
-
     for (_, joint_handle) in joint_handles.take_deleted().iter() {
         joints.remove(joint_handle.handle, &mut bodies, true);
     }
