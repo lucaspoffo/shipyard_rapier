@@ -133,7 +133,7 @@ pub fn create_child_collider_system(
     for (entity_id, (child, collider_builder)) in (&childs, &collider_builders).iter().with_id() {
         
         if let Ok(body_handle) = body_handles.get(child.parent) {
-            let handle = colliders.insert(collider_builder.build(), body_handle.0, &mut bodies);
+            let handle = colliders.insert(collider_builder.build(), body_handle.handle(), &mut bodies);
             entities.add_component(
                 entity_id,
                 &mut collider_handles,

@@ -10,7 +10,7 @@ use shipyard::EntityId;
 
 /// A component representing a rigid-body that is being handled by
 /// a Rapier physics World.
-pub struct RigidBodyHandleComponent(pub RigidBodyHandle);
+pub struct RigidBodyHandleComponent(RigidBodyHandle);
 
 impl From<RigidBodyHandle> for RigidBodyHandleComponent {
     fn from(handle: RigidBodyHandle) -> Self {
@@ -29,7 +29,7 @@ impl RigidBodyHandleComponent {
 
 /// A component representing a collider that is being handled by
 /// a Rapier physics World.
-pub struct ColliderHandleComponent(pub ColliderHandle);
+pub struct ColliderHandleComponent(ColliderHandle);
 
 impl From<ColliderHandle> for ColliderHandleComponent {
     fn from(handle: ColliderHandle) -> Self {
