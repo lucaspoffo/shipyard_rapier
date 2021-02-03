@@ -257,7 +257,7 @@ pub fn destroy_body_and_collider_system(
     mut body_handles: ViewMut<RigidBodyHandleComponent>,
 ) {
     for (entity, body_handle) in body_handles.take_deleted().iter() {
-        bodies.remove(body_handle.0, &mut colliders, &mut joints);
+        bodies.remove(body_handle.handle(), &mut colliders, &mut joints);
 
         // Removing a body also removes its colliders and joints. If they were
         // not also removed then we must remove them here.
@@ -266,7 +266,7 @@ pub fn destroy_body_and_collider_system(
     }
 
     for (_, collider_handle) in collider_handles.take_deleted().iter() {
-        colliders.remove(collider_handle.0, &mut bodies, true);
+        colliders.remove(collider_handle.handle(), &mut bodies, true);
     }
 
     for (_, joint_handle) in joint_handles.take_deleted().iter() {
