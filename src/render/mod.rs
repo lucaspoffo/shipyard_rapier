@@ -30,6 +30,7 @@ const PALLETE: [Color; 3] = [
     ),
 ];
 
+#[allow(dead_code)]
 const WIRE_COLOR: Color = Color::new(
         0x0e as f32 / 255.0,
         0x2c as f32 / 255.0,
