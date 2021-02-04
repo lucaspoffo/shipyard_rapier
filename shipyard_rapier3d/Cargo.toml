@@ -2,6 +2,7 @@
 name = "shipyard_rapier3d"
 version = "0.0.1"
 authors = ["Lucas Poffo <ltkpoffo@gmail.com>"]
+description = "An integration with the 3D physics engine rapier, for the shipard ECS."
 edition = "2018"
 keywords = [ "physics", "dynamics", "rigid",  "joints", "ecs" ]
 repository = "https://github.com/lucaspoffo/shipyard_rapier"
@@ -33,4 +34,4 @@ macroquad = { version = "=0.3.0-alpha.14", features = [ "log-impl" ], optional =
 concurrent-queue = "1"
 
 [dev-dependencies]
-shipyard_rapier3d = { path = ".", features = [ "render" ] } 
+shipyard_rapier3d = { path = ".", features = [ "render" ] }
