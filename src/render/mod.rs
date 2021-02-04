@@ -148,38 +148,52 @@ fn render_colider(collider: &Collider, color: Color, scale: f32, gl: &mut QuadGl
         pos.rotation.w,
     );
 
+    gl.push_model_matrix(glam::Mat4::from_scale_rotation_translation(
+        Vec3::one() * scale,
+        quat,
+        translation,
+    ));
+
     match shape.shape_type() {
         ShapeType::Cuboid => {
             let c = shape.as_cuboid().unwrap();
-
             let size = Vec3::new(c.half_extents.x, c.half_extents.y, c.half_extents.z) * 2.0;
-
-            gl.push_model_matrix(glam::Mat4::from_scale_rotation_translation(
-                Vec3::one() * scale,
-                quat,
-                translation,
-            ));
 
             draw_cube(Vec3::zero(), size, None, color);
             draw_cube_wires(Vec3::zero(), size, WIRE_COLOR);
-
-            gl.pop_model_matrix();
         }
         ShapeType::Ball => {
             let b = shape.as_ball().unwrap();
-
-            gl.push_model_matrix(glam::Mat4::from_scale_rotation_translation(
-                Vec3::one() * scale,
-                quat,
-                translation,
-            ));
-
             let radius = b.radius * scale;
 
             draw_sphere(Vec3::zero(), radius, None, color);
+        }
+        ShapeType::TriMesh => {
+            let t = shape.as_trimesh().unwrap();
+            let tris: Vec<([f32; 3], [f32; 2], [f32; 4])> = t
+                .vertices()
+                .iter()
+                .enumerate()
+                .map(|(i, v)| {
+                    let uv: [f32; 2] = match i % 3 {
+                        0 => [1., 0.],
+                        1 => [0., 1.],
+                        _ => [0., 0.],
+                    };
 
-            gl.pop_model_matrix();
+                    ([v.x, v.y, v.z], uv, color.into())
+                })
+                .collect();
+
+            gl.draw_mode(DrawMode::Lines);
+            let indices = t
+                .flat_indices()
+                .iter()
+                .map(|x| *x as u16)
+                .collect::<Vec<u16>>();
+            gl.geometry(&tris[..], &indices);
         }
         _ => {}
     }
+    gl.pop_model_matrix();
 }
