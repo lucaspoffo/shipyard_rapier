@@ -1,8 +1,12 @@
 [package]
 name = "shipyard_rapier2d"
-version = "0.1.0"
+version = "0.0.1"
 authors = ["Lucas Poffo <ltkpoffo@gmail.com>"]
 edition = "2018"
+keywords = [ "physics", "dynamics", "rigid",  "joints", "ecs" ]
+repository = "https://github.com/lucaspoffo/shipyard_rapier"
+readme = "README.md"
+license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -13,6 +17,7 @@ required-features = [ "dim2" ]
 [features]
 default = [ "dim2" ]
 dim2 = []
+render = [ "macroquad" ]
 parallel = [ "rapier2d/parallel" ]
 simd-stable = [ "rapier2d/simd-stable" ]
 simd-nightly = [ "rapier2d/simd-nightly" ]
@@ -24,5 +29,8 @@ enhanced-determinism = [ "rapier2d/enhanced-determinism" ]
 shipyard = { git = "https://github.com/leudz/shipyard.git" }
 nalgebra = "0.24"
 rapier2d = "0.5"
-macroquad = { version = "=0.3.0-alpha.14", features = [ "log-impl" ] }
+macroquad = { version = "=0.3.0-alpha.14", features = [ "log-impl" ], optional = true }
 concurrent-queue = "1"
+
+[dev-dependencies]
+shipyard_rapier2d = { path = ".", features = [ "render" ] }

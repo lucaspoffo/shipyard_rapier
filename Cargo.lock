@@ -1021,24 +1021,26 @@ dependencies = [
 
 [[package]]
 name = "shipyard_rapier2d"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "concurrent-queue",
  "macroquad",
  "nalgebra",
  "rapier2d",
  "shipyard",
+ "shipyard_rapier2d",
 ]
 
 [[package]]
 name = "shipyard_rapier3d"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "concurrent-queue",
  "macroquad",
  "nalgebra",
  "rapier3d",
  "shipyard",
+ "shipyard_rapier3d",
 ]
 
 [[package]]

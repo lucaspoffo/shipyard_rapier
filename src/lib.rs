@@ -5,4 +5,6 @@ pub extern crate rapier2d as rapier;
 pub extern crate rapier3d as rapier;
 
 pub mod physics;
+
+#[cfg(feature = "render")]
 pub mod render;
