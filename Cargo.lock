@@ -1028,6 +1028,7 @@ dependencies = [
  "nalgebra",
  "rapier2d",
  "shipyard",
+ "shipyard_rapier2d",
 ]
 
 [[package]]
