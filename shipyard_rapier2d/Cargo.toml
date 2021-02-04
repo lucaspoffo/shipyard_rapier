@@ -35,3 +35,7 @@ concurrent-queue = "1"
 
 [dev-dependencies]
 shipyard_rapier2d = { path = ".", features = [ "render" ] }
+
+[patch.crates-io]
+shipyard_rapier2d = { path = './' }
+
