@@ -6,7 +6,7 @@ description = "An integration with the 3D physics engine rapier, for the shipard
 edition = "2018"
 keywords = [ "physics", "dynamics", "rigid",  "joints", "ecs" ]
 repository = "https://github.com/lucaspoffo/shipyard_rapier"
-readme = "README.md"
+readme = "../README.md"
 license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
