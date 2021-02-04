@@ -180,6 +180,6 @@ fn render_colider(collider: &Collider, color: Color, scale: f32, gl: &mut QuadGl
 
             gl.pop_model_matrix();
         }
-        _ => {},
+        _ => {}
     }
 }

@@ -1,11 +1,11 @@
 use macroquad::prelude::*;
-use rapier2d::{
+use rapier3d::{
     dynamics::RigidBodyBuilder,
     geometry::{ColliderBuilder, ContactPairFilter, PairFilterContext, SolverFlags},
     pipeline::PhysicsPipeline,
 };
 use shipyard::{AllStoragesViewMut, UniqueViewMut, World};
-use shipyard_rapier2d::{
+use shipyard_rapier3d::{
     physics::{
         create_body_and_collider_system, create_joints_system, destroy_body_and_collider_system,
         setup_physics, step_world_system, InteractionPairFilters,
@@ -28,22 +28,16 @@ impl ContactPairFilter for SameUserDataFilter {
     }
 }
 
-#[macroquad::main("Contact Filter 2D")]
+#[macroquad::main("Contact Filter 3D")]
 async fn main() {
     let world = World::new();
     world.run(setup_physics).unwrap();
     world.run(setup_physics_world).unwrap();
 
-    let viewport_height = 60.0;
-    let aspect = screen_width() / screen_height();
-    let viewport_width = viewport_height * aspect;
-
-    let camera = Camera2D {
-        zoom: vec2(
-            1.0 / viewport_width as f32 * 2.,
-            -1.0 / viewport_height as f32 * 2.,
-        ),
-        target: vec2(0.0, 0.0),
+    let camera = Camera3D {
+        position: vec3(-30., 5., -30.),
+        up: vec3(0., 1., 0.),
+        target: vec3(0., 0., 0.),
         ..Default::default()
     };
 
@@ -85,18 +79,16 @@ pub fn setup_physics_world(mut all_storages: AllStoragesViewMut) {
         filters.contact_filter(SameUserDataFilter);
     }
 
-    all_storages.add_unique(InteractionPairFilters::new().contact_filter(SameUserDataFilter));
-
     let ground_size = 10.0;
 
     let rigid_body = RigidBodyBuilder::new_static()
-        .translation(0.0, -10.0)
+        .translation(0.0, -10.0, 0.0)
         .user_data(0);
-    let collider = ColliderBuilder::cuboid(ground_size, 1.2);
+    let collider = ColliderBuilder::cuboid(ground_size, 1.2, ground_size);
     all_storages.add_entity((rigid_body, collider));
 
     let rigid_body = RigidBodyBuilder::new_static().user_data(1);
-    let collider = ColliderBuilder::cuboid(ground_size, 1.2);
+    let collider = ColliderBuilder::cuboid(ground_size, 1.2, ground_size);
     all_storages.add_entity((rigid_body, collider));
 
     /*
@@ -117,8 +109,8 @@ pub fn setup_physics_world(mut all_storages: AllStoragesViewMut) {
             // Build the rigid body.
             let body = RigidBodyBuilder::new_dynamic()
                 .user_data(j as u128 % 2)
-                .translation(x, y);
-            let collider = ColliderBuilder::cuboid(rad, rad).density(1.0);
+                .translation(x, y, 0.0);
+            let collider = ColliderBuilder::cuboid(rad, rad, rad).density(1.0);
             all_storages.add_entity((body, collider));
         }
     }
