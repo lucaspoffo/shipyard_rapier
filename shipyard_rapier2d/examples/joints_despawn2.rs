@@ -17,7 +17,6 @@ use shipyard_rapier2d::{
     render::{render_colliders, render_physics_stats},
 };
 
-#[derive(Default)]
 pub struct DespawnResource {
     pub entities: Vec<EntityId>,
 }

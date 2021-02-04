@@ -1,6 +1,6 @@
 use macroquad::prelude::*;
 use rapier3d::{dynamics::RigidBodyBuilder, geometry::ColliderBuilder, pipeline::PhysicsPipeline};
-use shipyard::{AllStoragesViewMut, UniqueViewMut, World, EntityId};
+use shipyard::{AllStoragesViewMut, EntityId, UniqueViewMut, World};
 use shipyard_rapier3d::{
     physics::{
         create_body_and_collider_system, create_joints_system, destroy_body_and_collider_system,
@@ -41,7 +41,7 @@ async fn main() {
         world.run(destroy_body_and_collider_system).unwrap();
 
         world.run(render_colliders).unwrap();
-        
+
         // Run despawn system
         world.run_with_data(despawn, get_time()).unwrap();
 
@@ -66,7 +66,9 @@ pub fn setup_physics_world(mut all_storages: AllStoragesViewMut) {
     let rigid_body = RigidBodyBuilder::new_static().translation(0.0, -ground_height, 0.0);
     let collider = ColliderBuilder::cuboid(ground_size, ground_height, ground_size);
     let ground_entity = all_storages.add_entity((rigid_body, collider));
-    let despawn = DespawnResource { entity: Some(ground_entity) };
+    let despawn = DespawnResource {
+        entity: Some(ground_entity),
+    };
     all_storages.add_unique(despawn);
     /*
      * Create the cubes
