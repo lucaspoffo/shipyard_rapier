@@ -21,7 +21,7 @@ pub struct DespawnResource {
     pub entities: Vec<EntityId>,
 }
 
-#[macroquad::main("Joints 3D")]
+#[macroquad::main("Joints Despawn 3D")]
 async fn main() {
     let world = World::new();
     world.run(setup_physics).unwrap();
