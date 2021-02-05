@@ -1021,7 +1021,7 @@ dependencies = [
 
 [[package]]
 name = "shipyard_rapier2d"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
  "concurrent-queue",
  "macroquad",
@@ -1033,7 +1033,7 @@ dependencies = [
 
 [[package]]
 name = "shipyard_rapier3d"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
  "concurrent-queue",
  "macroquad",
