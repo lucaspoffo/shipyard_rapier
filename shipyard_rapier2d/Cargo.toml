@@ -1,12 +1,12 @@
 [package]
 name = "shipyard_rapier2d"
-version = "0.0.1"
+version = "0.0.2"
 authors = ["Lucas Poffo <ltkpoffo@gmail.com>"]
-description = "An integration with the 2D physics engine rapier, for the shipard ECS."
+description = "An integration with the physics engine rapier, for the shipard ECS."
 edition = "2018"
 keywords = [ "physics", "dynamics", "rigid",  "joints", "ecs" ]
 repository = "https://github.com/lucaspoffo/shipyard_rapier"
-readme = "../README.md"
+readme = "README.md"
 license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
