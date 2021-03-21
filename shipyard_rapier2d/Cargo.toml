@@ -27,7 +27,7 @@ serde-serialize = [ "rapier2d/serde-serialize" ]
 enhanced-determinism = [ "rapier2d/enhanced-determinism" ]
 
 [dependencies]
-shipyard = { git = "https://github.com/leudz/shipyard.git", version = "0.4.1" }
+shipyard = { version = "0.5.0" }
 nalgebra = "0.24"
 rapier2d = "0.5"
 macroquad = { version = "=0.3.0-alpha.14", features = [ "log-impl" ], optional = true }

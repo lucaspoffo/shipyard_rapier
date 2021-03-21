@@ -10,6 +10,7 @@ use shipyard::EntityId;
 
 /// A component representing a rigid-body that is being handled by
 /// a Rapier physics World.
+#[derive(Debug)]
 pub struct RigidBodyHandleComponent(RigidBodyHandle);
 
 impl From<RigidBodyHandle> for RigidBodyHandleComponent {
@@ -29,6 +30,7 @@ impl RigidBodyHandleComponent {
 
 /// A component representing a collider that is being handled by
 /// a Rapier physics World.
+#[derive(Debug)]
 pub struct ColliderHandleComponent(ColliderHandle);
 
 impl From<ColliderHandle> for ColliderHandleComponent {
@@ -50,6 +52,7 @@ impl ColliderHandleComponent {
 ///
 /// This component should not be created manually. It is automatically created and
 /// added to an entity by the `JointBuilderComponent`.
+#[derive(Debug)]
 pub struct JointHandleComponent {
     pub(crate) handle: JointHandle,
     entity1: EntityId,
