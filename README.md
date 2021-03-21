@@ -4,10 +4,10 @@
 
 Physics plugin with [rapier](https://github.com/dimforge/rapier) for the [shipyard](https://github.com/leudz/shipyard) ECS.
 
-2D:  ![Crates.io](https://img.shields.io/crates/v/shipyard_rapier2d)
+2D:  [![Crates.io](https://img.shields.io/crates/v/shipyard_rapier2d)](https://crates.io/crates/shipyard_rapier2d)
 [![Documentation](https://docs.rs/shipyard_rapier2d/badge.svg)](https://docs.rs/shipyard_rapier2d)
 
-3D:  ![Crates.io](https://img.shields.io/crates/v/shipyard_rapier3d)
+3D:  [![Crates.io](https://img.shields.io/crates/v/shipyard_rapier3d)](https://crates.io/crates/shipyard_rapier3d)
 [![Documentation](https://docs.rs/shipyard_rapier3d/badge.svg)](https://docs.rs/shipyard_rapier3d)
 
 </div>
