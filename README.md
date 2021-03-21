@@ -1,8 +1,16 @@
+<div align="center">
+
 # Shipyard Rapier
 
 Physics plugin with [rapier](https://github.com/dimforge/rapier) for the [shipyard](https://github.com/leudz/shipyard) ECS.
 
-Based of [bevy_rapier](https://github.com/dimforge/bevy_rapier/) plugin.
+2D: ![Crates.io](https://img.shields.io/crates/v/shipyard_rapier2d)
+[![Documentation](https://docs.rs/shipyard_rapier2d/badge.svg)](https://docs.rs/shipyard_rapier2d)
+
+3D: ![Crates.io](https://img.shields.io/crates/v/shipyard_rapier3d)
+[![Documentation](https://docs.rs/shipyard_rapier3d/badge.svg)](https://docs.rs/shipyard_rapier3d)
+
+</div>
 
 ## How to use
 
@@ -32,3 +40,5 @@ world.run_with_data(step_world_system, frame_time).unwrap();
 // Remove any physics components from deleted entities.
 world.run(destroy_body_and_collider_system).unwrap();
 ```
+
+This plugin is based of [bevy_rapier](https://github.com/dimforge/bevy_rapier/) plugin.
