@@ -45,6 +45,7 @@ const GROUND_COLOR: Color = Color::new(
     1.0,
 );
 
+/// Render the physics time and the total frame time in the screen.
 pub fn render_physics_stats(pipeline: UniqueView<PhysicsPipeline>) {
     let physics_time = format!("Physics time: {:.2}", pipeline.counters.step_time());
     let frame_time = format!("Frame time: {:.2}", get_frame_time() * 1000.);
@@ -54,7 +55,7 @@ pub fn render_physics_stats(pipeline: UniqueView<PhysicsPipeline>) {
     draw_text(&fps, 10.0, 50.0, 30.0, BLACK);
 }
 
-/// System responsible for attaching a PbrBundle to each entity having a collider.
+/// System responsible for rendering the colliders with the macroquad rendering crate.
 pub fn render_colliders(
     configuration: UniqueView<RapierConfiguration>,
     bodies: UniqueView<RigidBodySet>,

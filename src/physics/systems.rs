@@ -14,6 +14,7 @@ use shipyard::{
     ViewMut,
 };
 
+/// Setup the necessary rapier components to the shipyard World.
 pub fn setup_physics(all_storages: AllStoragesViewMut) {
     all_storages.add_unique(PhysicsPipeline::new());
     all_storages.add_unique(QueryPipeline::new());

@@ -96,7 +96,7 @@ impl UserPhysicsHooks {
         }
     }
 
-    /// Sets the physics hooks.
+    /// Set the user defined physics hooks.
     pub fn hooks(&mut self, hooks: impl PhysicsHooks + 'static) {
         self.hooks = Box::new(hooks) as Box<dyn PhysicsHooks>;
     }
