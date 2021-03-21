@@ -1,6 +1,6 @@
 use macroquad::prelude::*;
-use nalgebra::Vector2;
 use rapier2d::{
+    na::Vector2,
     dynamics::{RigidBodyBuilder, RigidBodySet},
     geometry::ColliderBuilder,
 };

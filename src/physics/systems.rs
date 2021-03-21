@@ -1,5 +1,5 @@
 use crate::physics::{
-    ColliderHandleComponent, EventQueue, InteractionPairFilters, JointBuilderComponent,
+    ColliderHandleComponent, EventQueue, UserPhysicsHooks, JointBuilderComponent,
     JointHandleComponent, PhysicsInterpolationComponent, RapierConfiguration,
     RigidBodyHandleComponent, SimulationToRenderTime,
 };
@@ -24,7 +24,7 @@ pub fn setup_physics(all_storages: AllStoragesViewMut) {
     all_storages.add_unique(RigidBodySet::new());
     all_storages.add_unique(ColliderSet::new());
     all_storages.add_unique(JointSet::new());
-    all_storages.add_unique(InteractionPairFilters::new());
+    all_storages.add_unique(UserPhysicsHooks::new());
     all_storages.add_unique(EventQueue::new(true));
     all_storages.add_unique(SimulationToRenderTime::default());
 
@@ -149,7 +149,7 @@ pub fn step_world_system(
         UniqueView<RapierConfiguration>,
         UniqueView<IntegrationParameters>,
     ),
-    filter: UniqueView<InteractionPairFilters>,
+    user_hooks: UniqueView<UserPhysicsHooks>,
     (mut pipeline, mut query_pipeline): (
         UniqueViewMut<PhysicsPipeline>,
         UniqueViewMut<QueryPipeline>,
@@ -195,8 +195,7 @@ pub fn step_world_system(
                     &mut bodies,
                     &mut colliders,
                     &mut joints,
-                    filter.contact_filter.as_deref(),
-                    filter.intersection_filter.as_deref(),
+                    &*user_hooks.hooks,
                     &*events,
                 );
             }
@@ -211,8 +210,7 @@ pub fn step_world_system(
             &mut bodies,
             &mut colliders,
             &mut joints,
-            filter.contact_filter.as_deref(),
-            filter.intersection_filter.as_deref(),
+            &*user_hooks.hooks,
             &*events,
         );
     }

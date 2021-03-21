@@ -27,9 +27,8 @@ serde-serialize = [ "rapier2d/serde-serialize" ]
 enhanced-determinism = [ "rapier2d/enhanced-determinism" ]
 
 [dependencies]
-shipyard = { version = "0.5.0" }
-nalgebra = "0.24"
-rapier2d = "0.5"
+shipyard = "0.5.0"
+rapier2d = "0.6.1"
 macroquad = { version = "=0.3.0-alpha.14", features = [ "log-impl" ], optional = true }
 concurrent-queue = "1"
 

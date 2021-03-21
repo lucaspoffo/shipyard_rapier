@@ -1,6 +1,6 @@
 use crate::rapier::{
-    geometry::{ContactEvent, ContactPairFilter, IntersectionEvent, IntersectionPairFilter},
-    pipeline::EventHandler,
+    geometry::{ContactEvent, IntersectionEvent},
+    pipeline::{EventHandler, PhysicsHooks},
 };
 use concurrent_queue::ConcurrentQueue;
 use rapier::math::Vector;
@@ -83,29 +83,21 @@ pub struct SimulationToRenderTime {
 }
 
 /// Custom filters for intersection and contact pairs.
-pub struct InteractionPairFilters {
-    /// Custom intersection pair filter.
-    pub intersection_filter: Option<Box<dyn IntersectionPairFilter>>,
-    /// Custom contact pair filter.
-    pub contact_filter: Option<Box<dyn ContactPairFilter>>,
+pub struct UserPhysicsHooks {
+    /// Custom user defined physics.
+    pub hooks: Box<dyn PhysicsHooks>,
 }
 
-impl InteractionPairFilters {
+impl UserPhysicsHooks {
     /// A new interaction pair filter with no custom intersection and contact pair filters.
     pub fn new() -> Self {
         Self {
-            intersection_filter: None,
-            contact_filter: None,
+            hooks: Box::new(()),
         }
     }
 
-    /// Sets the custom contact pair filter.
-    pub fn contact_filter(&mut self, filter: impl ContactPairFilter + 'static) {
-        self.contact_filter = Some(Box::new(filter) as Box<dyn ContactPairFilter>);
-    }
-
-    /// Sets the custom intersection pair filter.
-    pub fn intersection_filter(&mut self, filter: impl IntersectionPairFilter + 'static) {
-        self.intersection_filter = Some(Box::new(filter) as Box<dyn IntersectionPairFilter>);
+    /// Sets the physics hooks.
+    pub fn hooks(&mut self, hooks: impl PhysicsHooks + 'static) {
+        self.hooks = Box::new(hooks) as Box<dyn PhysicsHooks>;
     }
 }

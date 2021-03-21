@@ -1,6 +1,6 @@
 use macroquad::prelude::*;
-use nalgebra::Point2;
 use rapier2d::{
+    na::Point2,
     dynamics::{BallJoint, BodyStatus, RigidBodyBuilder},
     geometry::ColliderBuilder,
     pipeline::PhysicsPipeline,

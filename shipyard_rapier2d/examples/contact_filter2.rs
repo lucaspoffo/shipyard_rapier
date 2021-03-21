@@ -1,14 +1,14 @@
 use macroquad::prelude::*;
 use rapier2d::{
     dynamics::RigidBodyBuilder,
-    geometry::{ColliderBuilder, ContactPairFilter, PairFilterContext, SolverFlags},
-    pipeline::PhysicsPipeline,
+    geometry::{ColliderBuilder, SolverFlags},
+    pipeline::{PhysicsPipeline, PhysicsHooks, PhysicsHooksFlags, PairFilterContext},
 };
 use shipyard::{AllStoragesViewMut, UniqueViewMut, World};
 use shipyard_rapier2d::{
     physics::{
         create_body_and_collider_system, create_joints_system, destroy_body_and_collider_system,
-        setup_physics, step_world_system, InteractionPairFilters,
+        setup_physics, step_world_system, UserPhysicsHooks,
     },
     render::{render_colliders, render_physics_stats},
 };
@@ -18,7 +18,11 @@ use shipyard_rapier2d::{
 // Note that using collision groups would be a more efficient way of doing
 // this, but we use custom filters instead for demonstration purpose.
 struct SameUserDataFilter;
-impl ContactPairFilter for SameUserDataFilter {
+impl PhysicsHooks for SameUserDataFilter {
+    fn active_hooks(&self) -> PhysicsHooksFlags {
+        PhysicsHooksFlags::FILTER_CONTACT_PAIR
+    }
+
     fn filter_contact_pair(&self, context: &PairFilterContext) -> Option<SolverFlags> {
         if context.rigid_body1.user_data == context.rigid_body2.user_data {
             Some(SolverFlags::COMPUTE_IMPULSES)
@@ -79,13 +83,11 @@ pub fn setup_physics_world(mut all_storages: AllStoragesViewMut) {
      * Ground
      */
     {
-        let mut filters = all_storages
-            .borrow::<UniqueViewMut<InteractionPairFilters>>()
+        let mut user_hooks = all_storages
+            .borrow::<UniqueViewMut<UserPhysicsHooks>>()
             .unwrap();
-        filters.contact_filter(SameUserDataFilter);
+        user_hooks.hooks(SameUserDataFilter);
     }
-
-    all_storages.add_unique(InteractionPairFilters::new().contact_filter(SameUserDataFilter));
 
     let ground_size = 10.0;
 

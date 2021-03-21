@@ -1,6 +1,6 @@
 use macroquad::prelude::*;
-use nalgebra::{Isometry3, Point3, Unit, Vector3};
 use rapier3d::{
+    na::{Isometry3, Point3, Unit, Vector3},
     dynamics::{
         BallJoint, BodyStatus, FixedJoint, PrismaticJoint, RevoluteJoint, RigidBodyBuilder,
     },

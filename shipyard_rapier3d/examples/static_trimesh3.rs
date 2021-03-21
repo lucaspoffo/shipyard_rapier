@@ -1,6 +1,10 @@
 use macroquad::prelude::*;
-use nalgebra::Point3;
-use rapier3d::{dynamics::RigidBodyBuilder, geometry::ColliderBuilder, pipeline::PhysicsPipeline};
+use rapier3d::{
+    na::Point3,
+    dynamics::RigidBodyBuilder,
+    geometry::ColliderBuilder,
+    pipeline::PhysicsPipeline
+};
 use shipyard::{AllStoragesViewMut, EntitiesViewMut, UniqueViewMut, ViewMut, World};
 use shipyard_rapier3d::{
     physics::{
