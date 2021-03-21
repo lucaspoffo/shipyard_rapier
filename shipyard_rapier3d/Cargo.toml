@@ -1,6 +1,6 @@
 [package]
 name = "shipyard_rapier3d"
-version = "0.0.2"
+version = "0.1.0"
 authors = ["Lucas Poffo <ltkpoffo@gmail.com>"]
 description = "An integration with the physics engine rapier, for the shipard ECS."
 edition = "2018"
